@@ -1,13 +1,18 @@
 package com.octacore.rexpay.ui
 
-import androidx.compose.foundation.layout.Box
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.octacore.rexpay.domain.BasePaymentRepo
 import com.octacore.rexpay.models.PayPayload
 import com.octacore.rexpay.ui.carddetail.CardDetailScreen
+import com.octacore.rexpay.ui.selection.SelectionScreen
+import com.octacore.rexpay.ui.selection.SelectionViewModel
+import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -19,6 +24,7 @@ import com.octacore.rexpay.ui.carddetail.CardDetailScreen
 
 @Composable
 fun AppNavGraph(
+    activity: Activity,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = NavigationItem.Selection.route,
@@ -30,7 +36,15 @@ fun AppNavGraph(
         modifier = modifier,
     ) {
         composable(NavigationItem.Selection.route) {
-            SelectionScreen(navController, payload)
+            val baseRepo = BasePaymentRepo.getInstance()
+            val viewModel: SelectionViewModel =
+                viewModel(factory = SelectionViewModel.provideFactory(baseRepo, payload))
+            SelectionScreen(
+                activity = activity,
+                navHostController = navController,
+                payload = payload,
+                viewModel = viewModel
+            )
         }
         composable(NavigationItem.CardDetail.route) {
             CardDetailScreen(navController, payload)

@@ -3,8 +3,10 @@
 package com.octacore.rexpay.domain
 
 import com.octacore.rexpay.data.BasePaymentRepoImpl
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.PaymentService
 import com.octacore.rexpay.models.PayPayload
+import com.octacore.rexpay.models.PaymentCreationResponse
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -15,7 +17,7 @@ import com.octacore.rexpay.models.PayPayload
  **************************************************************************************************/
 internal interface BasePaymentRepo {
 
-    suspend fun initiatePayment(request: PayPayload)
+    suspend fun initiatePayment(request: PayPayload?): BaseResult<PaymentCreationResponse?>
 
     companion object {
         @Volatile

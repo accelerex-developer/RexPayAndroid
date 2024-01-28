@@ -8,6 +8,7 @@ import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.RexPay.Companion.PAYMENT_PAYLOAD
 import com.octacore.rexpay.models.PayPayload
 import com.octacore.rexpay.ui.PaymentActivity
+import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

@@ -4,15 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.octacore.rexpay.models.PayPayload
 import com.octacore.rexpay.ui.theme.RexpayTheme
 import java.util.UUID
@@ -25,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colors.background
                 ) {
                     Button(
                         modifier = Modifier.wrapContentSize(),
@@ -36,11 +33,13 @@ class MainActivity : ComponentActivity() {
                                 override fun onFailure() {}
                             })
                             val payload = PayPayload(
-                                reference = UUID.randomUUID().toString(),
+                                reference = UUID.randomUUID().toString().replace(Regex("\\W"), ""),
                                 amount = 1,
                                 currency = "NGN",
                                 userId = "random.user@email.com",
                                 callbackUrl = "",
+                                email = "random.user@email.com",
+                                customerName = "Random User"
                             )
                             rexPay.makePayment(payload)
                         }

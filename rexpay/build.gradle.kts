@@ -1,12 +1,28 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.android.kotlin)
     id(libs.plugins.android.kotlin.parcelize.get().pluginId)
 }
 
+fun getCredProps(): Properties {
+    val vPropsFile = rootProject.file("cred.properties")
+    if (vPropsFile.exists() || vPropsFile.canRead()) {
+        val vProps = Properties()
+        vProps.load(FileInputStream(vPropsFile))
+        return vProps
+    } else {
+        throw GradleException("Could not find version.properties")
+    }
+}
+
 android {
     namespace = "com.octacore.rexpay"
     compileSdk = 34
+
+    val credProps = getCredProps()
 
     defaultConfig {
         minSdk = 24
@@ -16,6 +32,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "API_USERNAME", credProps["API_USERNAME"].toString())
+        buildConfigField("String", "API_PASSWORD", credProps["API_PASSPHRASE"].toString())
+        buildConfigField("String", "API_URL", credProps["API_URL"].toString())
     }
 
     buildTypes {
@@ -36,6 +55,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -57,9 +77,18 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gson.converter)
+    implementation(libs.retrofit.okhttp.logger)
+    implementation(libs.airbnb.lottie.anim.compose)
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

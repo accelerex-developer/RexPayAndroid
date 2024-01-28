@@ -1,8 +1,4 @@
-@file:JvmSynthetic
-
 package com.octacore.rexpay.data
-
-import com.octacore.rexpay.domain.CardTransactionRepo
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -11,5 +7,9 @@ import com.octacore.rexpay.domain.CardTransactionRepo
  * Author          : Gideon Chukwu
  * Date            : 27/01/2024
  **************************************************************************************************/
-internal class CardTransactionRepoImpl(private val service: PaymentService?) : CardTransactionRepo {
+
+sealed class BaseResult<out T> {
+    data class Success<out T>(val result: T) : BaseResult<T>()
+
+    data class Error(val message: String) : BaseResult<Nothing>()
 }

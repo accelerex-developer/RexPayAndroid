@@ -17,6 +17,6 @@ data class PayPayload(
     val currency: String,
     val userId: String,
     val callbackUrl: String,
-    val email: String? = null,
-    val customerName: String? = null,
+    val email: String,
+    val customerName: String,
 ) : Parcelable
