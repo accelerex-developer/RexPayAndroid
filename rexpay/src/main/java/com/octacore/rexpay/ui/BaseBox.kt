@@ -8,26 +8,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +32,7 @@ import androidx.navigation.NavOptions
 import com.octacore.rexpay.R
 import com.octacore.rexpay.models.PayPayload
 import com.octacore.rexpay.models.PaymentOptions
-import com.octacore.rexpay.ui.theme.RexpayTheme
+import com.octacore.rexpay.ui.theme.RexPayTheme
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
 import com.octacore.rexpay.utils.StringUtil
@@ -168,7 +158,7 @@ private fun getTitle(payload: PayPayload?): String {
 )
 @Composable
 fun BasePreview() {
-    RexpayTheme {
+    RexPayTheme {
         BaseBox(null) { Box(modifier = Modifier) }
     }
 }

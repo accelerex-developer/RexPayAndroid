@@ -40,7 +40,7 @@ import com.octacore.rexpay.models.PayPayload
 import com.octacore.rexpay.models.PaymentOptions
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.CustomDialog
-import com.octacore.rexpay.ui.theme.RexpayTheme
+import com.octacore.rexpay.ui.theme.RexPayTheme
 import com.octacore.rexpay.ui.theme.textBlack
 
 /***************************************************************************************************
@@ -153,7 +153,7 @@ private fun OptionItem(option: PaymentOptions, navController: NavHostController)
 )
 @Composable
 fun SelectionPreview() {
-    RexpayTheme {
+    RexPayTheme {
         SelectionScreen(
             navHostController = rememberNavController(),
             activity = Activity(),

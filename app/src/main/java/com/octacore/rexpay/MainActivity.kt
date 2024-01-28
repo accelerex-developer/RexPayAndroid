@@ -11,14 +11,14 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import com.octacore.rexpay.models.PayPayload
-import com.octacore.rexpay.ui.theme.RexpayTheme
+import com.octacore.rexpay.ui.theme.RexPayTheme
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RexpayTheme {
+            RexPayTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

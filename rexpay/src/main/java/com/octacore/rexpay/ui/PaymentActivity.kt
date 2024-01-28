@@ -17,7 +17,7 @@ import com.octacore.rexpay.R
 import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.RexPay.Companion.PAYMENT_PAYLOAD
 import com.octacore.rexpay.models.PayPayload
-import com.octacore.rexpay.ui.theme.RexpayTheme
+import com.octacore.rexpay.ui.theme.RexPayTheme
 
 class PaymentActivity : ComponentActivity() {
     private val rexPay = RexPay.getInstance()
@@ -33,7 +33,7 @@ class PaymentActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RexpayTheme {
+            RexPayTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
