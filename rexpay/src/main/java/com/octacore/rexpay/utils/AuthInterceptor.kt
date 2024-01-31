@@ -17,10 +17,8 @@ import okhttp3.Response
 internal class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        LogUtils.i("Previous Request: $request")
         val cred = Credentials.basic(BuildConfig.API_USERNAME, BuildConfig.API_PASSWORD)
         request = request.newBuilder().header("Authorization", cred).build()
-        LogUtils.i("Next Request: $request")
         return chain.proceed(request)
     }
 }

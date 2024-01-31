@@ -1,3 +1,5 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.ui
 
 import androidx.compose.foundation.background
@@ -33,7 +35,7 @@ import com.octacore.rexpay.ui.theme.PurpleGrey40
  **************************************************************************************************/
 
 @Composable
-fun CustomDialog(
+internal fun CustomDialog(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,

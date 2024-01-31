@@ -1,9 +1,11 @@
 package com.octacore.rexpay
 
+import android.app.Application
 import android.content.Context
-import com.octacore.rexpay.data.PaymentService
+import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.RexPayImpl
-import com.octacore.rexpay.models.PayPayload
+import com.octacore.rexpay.data.local.RexPayDb
+import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
@@ -24,18 +26,22 @@ interface RexPay {
 
         private var INSTANCE: RexPay? = null
 
+        private lateinit var context: Application
+
         @JvmStatic
-        fun getInstance(context: Context, showLog: Boolean = BuildConfig.DEBUG): RexPay {
-            return INSTANCE ?: synchronized(this) {
-                LogUtils.init(showLog = showLog)
-                PaymentService.getInstance(context)
-                val instance = RexPayImpl(context)
+        fun init(context: Context, showLog: Boolean = BuildConfig.DEBUG) {
+            this.context = context.applicationContext as Application
+            LogUtils.init(showLog = showLog)
+            DI.init(context)
+        }
+
+        val instance by lazy {
+            INSTANCE ?: synchronized(this) {
+                val instance = RexPayImpl(context, DI.database)
                 INSTANCE = instance
                 instance
             }
         }
-
-        internal fun getInstance(): RexPay? = INSTANCE
     }
 
     interface RexPayListener {

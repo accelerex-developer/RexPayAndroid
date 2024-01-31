@@ -2,14 +2,16 @@
 
 package com.octacore.rexpay.ui.selection
 
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.octacore.rexpay.data.BaseResult
-import com.octacore.rexpay.domain.BasePaymentRepo
-import com.octacore.rexpay.models.PayPayload
-import com.octacore.rexpay.models.PaymentCreationResponse
-import com.octacore.rexpay.utils.LogUtils
+import com.octacore.rexpay.domain.models.BaseResult
+import com.octacore.rexpay.domain.repo.BasePaymentRepo
+import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
+import com.octacore.rexpay.domain.models.Payment
+import com.octacore.rexpay.domain.models.Transaction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,21 +25,23 @@ import kotlinx.coroutines.launch
  * Date            : 27/01/2024
  **************************************************************************************************/
 internal class SelectionViewModel(
-    private val repo: BasePaymentRepo,
-    private val payload: PayPayload?,
+    savedStateHandle: SavedStateHandle,
+    private val repo: BasePaymentRepo
 ) : ViewModel() {
 
+    private val reference: String = checkNotNull(savedStateHandle["reference"])
+
     private val _uiState = MutableStateFlow(SelectionState())
-    val uiState = _uiState.asStateFlow()
+    internal val uiState = _uiState.asStateFlow()
 
     init {
         initiateTransaction()
     }
 
-    fun initiateTransaction() {
+    internal fun initiateTransaction() {
         _uiState.update { SelectionState(isLoading = true) }
         viewModelScope.launch {
-            when (val res = repo.initiatePayment(payload)) {
+            when (val res = repo.initiatePayment(reference)) {
                 is BaseResult.Success -> {
                     _uiState.update { it.copy(isLoading = false, response = res.result) }
                 }
@@ -49,16 +53,21 @@ internal class SelectionViewModel(
         }
     }
 
-    fun dismissError() {
+    internal fun dismissError() {
         _uiState.update { SelectionState() }
     }
 
-    companion object {
-        fun provideFactory(repo: BasePaymentRepo, payload: PayPayload?): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory {
+    internal companion object {
+        internal fun provideFactory(repo: BasePaymentRepo): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory, AbstractSavedStateViewModelFactory() {
+
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return SelectionViewModel(repo, payload) as T
+                override fun <T : ViewModel> create(
+                    key: String,
+                    modelClass: Class<T>,
+                    handle: SavedStateHandle
+                ): T {
+                    return SelectionViewModel(handle, repo) as T
                 }
             }
     }
@@ -67,5 +76,5 @@ internal class SelectionViewModel(
 internal data class SelectionState(
     val isLoading: Boolean = false,
     val errorMsg: String? = null,
-    val response: PaymentCreationResponse? = null,
+    val response: Payment? = null,
 )

@@ -2,8 +2,8 @@
 compileSdk = "34"
 minSdk = "24"
 targetSdk = "34"
-androidGradlePlugin = "8.2.1"
-kotlin = "1.9.0"
+androidGradlePlugin = "8.2.2"
+kotlin = "1.9.22"
 androidxCore = "1.12.0"
 androidxLifecycle = "2.7.0"
 androidxActivity = "1.8.2"
@@ -17,6 +17,11 @@ androidxNav = "2.7.6"
 retrofit = "2.9.0"
 okhttp = "4.12.0"
 lottie = "4.0.0"
+gson = "2.10.1"
+datastore = "1.0.0"
+room = "2.6.1"
+ksp = "1.9.22-1.0.17"
+compose = "1.5.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
@@ -45,9 +50,14 @@ retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.r
 retrofit-gson-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 retrofit-okhttp-logger = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 airbnb-lottie-anim-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-kotlin-parcelize = { id = "kotlin-parcelize", version.ref = "kotlin" }
+android-kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

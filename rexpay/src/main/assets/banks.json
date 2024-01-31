@@ -1,0 +1,80 @@
+[
+  {
+    "name": "ACCESS BANK",
+    "code": "044",
+    "display": "Access Bank"
+  },
+  {
+    "name": "ECOBANK NIGERIA",
+    "code": "050",
+    "display": "Ecobank"
+  },
+
+  {
+    "name": "FIDELITY BANK ",
+    "code": "070",
+    "display": "Fidelity Bank"
+  },
+  {
+    "name": "FIRST BANK OF NIGERIA",
+    "code": "011",
+    "display": "First Bank"
+  },
+  {
+    "name": "FIRST CITY MONUMENT BANK",
+    "code": "214",
+    "display": "FCMB"
+  },
+  {
+    "name": "GUARANTY TRUST BANK",
+    "code": "058",
+    "display": "GTBank"
+  },
+
+  {
+    "name": "KEYSTONE BANK",
+    "code": "082",
+    "display": "Keystone Bank"
+  },
+  {
+    "name": "Rubies (Highstreet)",
+    "code": "7797",
+    "display": "Rubies Bank"
+  },
+  {
+    "name": "STANBIC IBTC BANK",
+    "code": "221",
+    "display": "Stanbic IBTC"
+  },
+  {
+    "name": "STERLING BANK",
+    "code": "232",
+    "display": "Sterling Bank"
+  },
+  {
+    "name": "UNITED BANK FOR AFRICA",
+    "code": "033",
+    "display": "UBA"
+  },
+  {
+    "name": "UNITY BANK",
+    "code": "215",
+    "display": "Unity Bank"
+  },
+  {
+    "name": "VFD",
+    "code": "322",
+    "display": "VFD"
+  },
+  {
+    "name": "WEMA BANK",
+    "code": "035",
+    "display": "Wema Bank"
+  },
+
+  {
+    "name": "ZENITH BANK",
+    "code": "057",
+    "display": "Zenith Bank"
+  }
+]

@@ -1,3 +1,5 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.ui.theme
 
 import android.app.Activity
@@ -22,7 +24,7 @@ private val LightColorScheme = lightColors(
 )
 
 @Composable
-fun RexPayTheme(
+internal fun RexPayTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

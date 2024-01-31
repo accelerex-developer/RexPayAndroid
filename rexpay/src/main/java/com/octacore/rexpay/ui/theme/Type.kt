@@ -1,3 +1,5 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.ui.theme
 
 import androidx.compose.material.Typography
@@ -10,7 +12,7 @@ import androidx.compose.ui.unit.sp
 import com.octacore.rexpay.R
 
 
-val PoppinsFamily = FontFamily(
+internal val PoppinsFamily = FontFamily(
     Font(R.font.poppins_thin, FontWeight(100)),
     Font(R.font.poppins_thin_italic, FontWeight(100), FontStyle.Italic),
     Font(R.font.poppins_extra_light, FontWeight(200)),
@@ -32,7 +34,7 @@ val PoppinsFamily = FontFamily(
 )
 
 // Set of Material typography styles to start with
-val Typography = Typography(
+internal val Typography = Typography(
     body1 = TextStyle(
         fontFamily = PoppinsFamily,
         fontSize = 16.sp,

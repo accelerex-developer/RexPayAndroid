@@ -1,3 +1,5 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.ui
 
 import androidx.compose.foundation.Image
@@ -30,8 +32,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.octacore.rexpay.R
-import com.octacore.rexpay.models.PayPayload
-import com.octacore.rexpay.models.PaymentOptions
+import com.octacore.rexpay.domain.models.Payment
+import com.octacore.rexpay.domain.models.PaymentOptions
+import com.octacore.rexpay.domain.models.Transaction
 import com.octacore.rexpay.ui.theme.RexPayTheme
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
@@ -46,8 +49,8 @@ import com.octacore.rexpay.utils.StringUtil
  **************************************************************************************************/
 
 @Composable
-fun BaseBox(
-    payload: PayPayload?,
+internal fun BaseBox(
+    payment: Payment?,
     modifier: Modifier = Modifier,
     elevation: Dp = 0.5.dp,
     content: @Composable BoxScope.() -> Unit
@@ -67,14 +70,14 @@ fun BaseBox(
                 .wrapContentSize()
         ) {
             Text(
-                text = StringUtil.formatToNaira(payload?.amount),
+                text = StringUtil.formatToNaira(payment?.amount),
                 modifier = Modifier.padding(top = 8.dp),
                 fontWeight = FontWeight.W600,
                 fontSize = 20.sp,
                 color = textBlack
             )
             Text(
-                text = getTitle(payload),
+                text = getTitle(payment),
                 fontSize = 12.sp,
                 color = textGray
             )
@@ -103,28 +106,34 @@ fun BaseBox(
 }
 
 @Composable
-fun BaseTopNav(navController: NavHostController) {
+internal fun BaseTopNav(navController: NavHostController, reference: String? = null) {
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp)
     ) {
         PaymentOptions.options.filter { it.active }
-            .map { OptionItem(it, navController) }
+            .map { OptionItem(it, navController, reference) }
     }
 }
 
 @Composable
-private fun RowScope.OptionItem(option: PaymentOptions, navHostController: NavHostController) {
+private fun RowScope.OptionItem(
+    option: PaymentOptions,
+    navHostController: NavHostController,
+    reference: String?
+) {
     Box(
         modifier = Modifier
             .weight(1f)
             .padding(horizontal = 4.dp)
             .clickable {
-                val options = NavOptions.Builder()
+                val options = NavOptions
+                    .Builder()
+                    .setPopUpTo(NavigationItem.Selection.route, inclusive = false)
                     .setLaunchSingleTop(true)
                     .build()
-                navHostController.navigate(option.route, options)
+                navHostController.navigate(option.route + "/$reference", options)
             },
         contentAlignment = Alignment.Center
     ) {
@@ -143,7 +152,7 @@ private fun RowScope.OptionItem(option: PaymentOptions, navHostController: NavHo
     }
 }
 
-private fun getTitle(payload: PayPayload?): String {
+private fun getTitle(payload: Payment?): String {
     return when {
         payload?.userId.isNullOrEmpty().not() -> payload?.userId
         payload?.email.isNullOrEmpty().not() -> payload?.email
@@ -157,7 +166,7 @@ private fun getTitle(payload: PayPayload?): String {
     showSystemUi = true
 )
 @Composable
-fun BasePreview() {
+internal fun BasePreview() {
     RexPayTheme {
         BaseBox(null) { Box(modifier = Modifier) }
     }

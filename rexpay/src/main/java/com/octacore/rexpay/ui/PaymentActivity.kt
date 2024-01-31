@@ -1,3 +1,5 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.ui
 
 import android.os.Build
@@ -16,11 +18,11 @@ import androidx.navigation.compose.rememberNavController
 import com.octacore.rexpay.R
 import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.RexPay.Companion.PAYMENT_PAYLOAD
-import com.octacore.rexpay.models.PayPayload
+import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.ui.theme.RexPayTheme
 
-class PaymentActivity : ComponentActivity() {
-    private val rexPay = RexPay.getInstance()
+internal class PaymentActivity : ComponentActivity() {
+    private val rexPay = RexPay.instance
 
     private val payload by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

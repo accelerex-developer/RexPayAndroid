@@ -4,6 +4,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.android.kotlin)
+    alias(libs.plugins.android.kotlin.ksp)
     id(libs.plugins.android.kotlin.parcelize.get().pluginId)
 }
 
@@ -58,7 +59,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
     }
     packaging {
         resources {
@@ -89,6 +90,10 @@ dependencies {
     implementation(libs.retrofit.gson.converter)
     implementation(libs.retrofit.okhttp.logger)
     implementation(libs.airbnb.lottie.anim.compose)
+    implementation(libs.google.gson)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

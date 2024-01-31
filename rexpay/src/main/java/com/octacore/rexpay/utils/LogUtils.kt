@@ -14,16 +14,16 @@ import android.util.Log
 internal object LogUtils {
     private var TAG = "RexPayLog"
 
-    var showLog: Boolean = false
+    internal var showLog: Boolean = false
 
     @JvmStatic
-    fun init(showLog: Boolean, tag: String? = null) {
+    internal fun init(showLog: Boolean, tag: String? = null) {
         TAG = tag ?: TAG
         this.showLog = showLog
     }
 
     @JvmStatic
-    fun d(msg: String, tag: String? = null) {
+    internal fun d(msg: String, tag: String? = null) {
         if (showLog) {
             val t = tag ?: TAG
             Log.d(t, msg)
@@ -31,7 +31,7 @@ internal object LogUtils {
     }
 
     @JvmStatic
-    fun e(msg: String, tag: String? = null) {
+    internal fun e(msg: String, tag: String? = null) {
         if (showLog) {
             val t = tag ?: TAG
             Log.e(t, msg)
@@ -39,7 +39,7 @@ internal object LogUtils {
     }
 
     @JvmStatic
-    fun e(msg: String?, e: Exception, tag: String? = null) {
+    internal fun e(msg: String?, e: Exception, tag: String? = null) {
         if (showLog) {
             val t = tag ?: TAG
             Log.e(t, msg, e)
@@ -47,7 +47,7 @@ internal object LogUtils {
     }
 
     @JvmStatic
-    fun i(msg: String, tag: String? = null) {
+    internal fun i(msg: String, tag: String? = null) {
         if (showLog) {
             val t = tag ?: TAG
             Log.i(t, msg)
@@ -55,7 +55,7 @@ internal object LogUtils {
     }
 
     @JvmStatic
-    fun v(msg: String, tag: String? = null) {
+    internal fun v(msg: String, tag: String? = null) {
         if (showLog) {
             val t = tag ?: TAG
             Log.v(t, msg)
@@ -63,7 +63,7 @@ internal object LogUtils {
     }
 
     @JvmStatic
-    fun w(msg: String, tag: String? = null) {
+    internal fun w(msg: String, tag: String? = null) {
         if (showLog) {
             val t = tag ?: TAG
             Log.w(t, msg)

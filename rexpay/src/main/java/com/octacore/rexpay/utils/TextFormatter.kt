@@ -1,3 +1,5 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.utils
 
 import androidx.compose.runtime.getValue
@@ -14,13 +16,13 @@ import androidx.compose.ui.text.input.VisualTransformation
  * Author          : Gideon Chukwu
  * Date            : 28/01/2024
  **************************************************************************************************/
-class CreditCardFormatter {
-    var textFieldValue by mutableStateOf(TextFieldValue(""))
+internal class CreditCardFormatter {
+    internal var textFieldValue by mutableStateOf(TextFieldValue(""))
 
-    val visualTransformation: VisualTransformation
+    internal val visualTransformation: VisualTransformation
         get() = VisualTransformation.None
 
-    fun formatCreditCard(textFieldValue: TextFieldValue) {
+    internal fun formatCreditCard(textFieldValue: TextFieldValue) {
         val trimmedValue = textFieldValue.text.replace("\\s+".toRegex(), "")
         val formattedValue = StringBuilder()
         for (i in trimmedValue.indices) {
@@ -39,13 +41,13 @@ class CreditCardFormatter {
     }
 }
 
-class ExpiryDateFormatter {
-    var textFieldValue by mutableStateOf(TextFieldValue(""))
+internal class ExpiryDateFormatter {
+    internal var textFieldValue by mutableStateOf(TextFieldValue(""))
 
-    val visualTransformation: VisualTransformation
+    internal val visualTransformation: VisualTransformation
         get() = VisualTransformation.None
 
-    fun formatExpiryDate(textFieldValue: TextFieldValue) {
+    internal fun formatExpiryDate(textFieldValue: TextFieldValue) {
         val trimmedValue = textFieldValue.text.replace(Regex("[^A-Za-z0-9]") , "")
 
         val formattedValue = StringBuilder()

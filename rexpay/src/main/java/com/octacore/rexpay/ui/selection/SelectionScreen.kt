@@ -15,7 +15,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,8 +36,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
-import com.octacore.rexpay.models.PayPayload
-import com.octacore.rexpay.models.PaymentOptions
+import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.theme.RexPayTheme
@@ -54,14 +53,13 @@ import com.octacore.rexpay.ui.theme.textBlack
 @Composable
 internal fun SelectionScreen(
     activity: Activity,
-    navHostController: NavHostController,
-    payload: PayPayload?,
+    navController: NavHostController,
     viewModel: SelectionViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (!uiState.isLoading && uiState.response == null && uiState.errorMsg == null) {
-        val res = navHostController.navigateUp()
+        val res = navController.navigateUp()
         if (res.not()) {
             activity.finishAfterTransition()
         }
@@ -103,7 +101,7 @@ internal fun SelectionScreen(
             )
         }
     } else {
-        BaseBox(payload) {
+        BaseBox(uiState.response) {
             Column {
                 Text(
                     text = "Please select your desired payment method to continue.",
@@ -112,14 +110,18 @@ internal fun SelectionScreen(
                     color = textBlack.copy(alpha = 0.72F)
                 )
                 PaymentOptions.options.filter { it.active }
-                    .map { OptionItem(it, navHostController) }
+                    .map { OptionItem(it, uiState.response?.reference, navController) }
             }
         }
     }
 }
 
 @Composable
-private fun OptionItem(option: PaymentOptions, navController: NavHostController) {
+private fun OptionItem(
+    option: PaymentOptions,
+    reference: String?,
+    navController: NavHostController
+) {
     Box(modifier = Modifier
         .padding(vertical = 8.dp)
         .clickable {
@@ -127,7 +129,7 @@ private fun OptionItem(option: PaymentOptions, navController: NavHostController)
                 .Builder()
                 .setLaunchSingleTop(true)
                 .build()
-            navController.navigate(option.route, navOption)
+            navController.navigate(option.route + "/$reference", navOption)
         }) {
         Row(
             modifier = Modifier.padding(vertical = 16.dp)
@@ -142,7 +144,8 @@ private fun OptionItem(option: PaymentOptions, navController: NavHostController)
                 fontSize = 14.sp
             )
             Icon(
-                imageVector = Icons.Rounded.KeyboardArrowRight, contentDescription = "Forward arrow"
+                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                contentDescription = "Forward arrow"
             )
         }
     }
@@ -152,12 +155,11 @@ private fun OptionItem(option: PaymentOptions, navController: NavHostController)
     showBackground = true, showSystemUi = true
 )
 @Composable
-fun SelectionPreview() {
+internal fun SelectionPreview() {
     RexPayTheme {
         SelectionScreen(
-            navHostController = rememberNavController(),
+            navController = rememberNavController(),
             activity = Activity(),
-            payload = null,
         )
     }
 }

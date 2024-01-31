@@ -16,9 +16,13 @@ import java.util.Locale
 internal object StringUtil {
 
     @JvmStatic
-    fun formatToNaira(amount: Number?, currency: String = "NGN"): String {
+    internal fun formatToNaira(amount: Number?, currency: String = "NGN"): String {
         val formatter = NumberFormat.getCurrencyInstance(Locale("en", "NG"))
         formatter.currency = Currency.getInstance(currency)
-        return formatter.format(amount)
+        return try {
+            formatter.format(amount)
+        } catch (e: IllegalArgumentException) {
+            ""
+        }
     }
 }

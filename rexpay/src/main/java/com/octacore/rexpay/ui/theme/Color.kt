@@ -1,17 +1,19 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+internal val Purple80 = Color(0xFFD0BCFF)
+internal val PurpleGrey80 = Color(0xFFCCC2DC)
+internal val Pink80 = Color(0xFFEFB8C8)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+internal val Purple40 = Color(0xFF6650a4)
+internal val PurpleGrey40 = Color(0xFF625b71)
+internal val Pink40 = Color(0xFF7D5260)
 
-val textGray = Color(0xFF9C9898)
-val textBlack = Color(0xFF1A1A1A)
-val lineGray = Color(0xFFDFDEDE)
+internal val textGray = Color(0xFF9C9898)
+internal val textBlack = Color(0xFF1A1A1A)
+internal val lineGray = Color(0xFFDFDEDE)
 
-val Red = Color(0xFFED1C25)
+internal val Red = Color(0xFFED1C25)
