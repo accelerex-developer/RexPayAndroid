@@ -4,10 +4,8 @@ package com.octacore.rexpay.data.repo
 
 import com.octacore.rexpay.data.local.RexPayDb
 import com.octacore.rexpay.data.local.entities.AccountEntity
-import com.octacore.rexpay.data.local.entities.PaymentEntity
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.ChargeBankRequest
-import com.octacore.rexpay.data.remote.models.ChargeBankResponse
 import com.octacore.rexpay.data.remote.models.TransactionStatusRequest
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.domain.models.BankAccount

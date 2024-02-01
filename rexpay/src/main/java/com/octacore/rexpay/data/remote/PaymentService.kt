@@ -4,7 +4,6 @@ package com.octacore.rexpay.data.remote
 
 import android.content.Context
 import com.google.gson.GsonBuilder
-import com.octacore.rexpay.BuildConfig
 import com.octacore.rexpay.data.remote.models.ChargeBankRequest
 import com.octacore.rexpay.data.remote.models.ChargeBankResponse
 import com.octacore.rexpay.data.remote.models.ChargeUssdRequest

@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,8 +33,6 @@ import androidx.navigation.NavOptions
 import com.octacore.rexpay.R
 import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.models.PaymentOptions
-import com.octacore.rexpay.domain.models.Transaction
-import com.octacore.rexpay.ui.theme.RexPayTheme
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
 import com.octacore.rexpay.utils.StringUtil
@@ -160,15 +157,4 @@ private fun getTitle(payload: Payment?): String {
         payload?.customerName.isNullOrEmpty().not() -> payload?.customerName
         else -> ""
     } ?: ""
-}
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
-@Composable
-internal fun BasePreview() {
-    RexPayTheme {
-        BaseBox(null) { Box(modifier = Modifier) }
-    }
 }

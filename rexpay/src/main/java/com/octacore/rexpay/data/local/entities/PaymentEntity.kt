@@ -2,7 +2,6 @@ package com.octacore.rexpay.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.octacore.rexpay.data.remote.models.ChargeBankResponse
 import com.octacore.rexpay.data.remote.models.ChargeUssdResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.PayPayload

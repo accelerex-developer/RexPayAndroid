@@ -16,18 +16,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
 import com.octacore.rexpay.ui.NavigationItem
-import com.octacore.rexpay.ui.theme.PoppinsFamily
 import com.octacore.rexpay.ui.theme.Red
 
 /***************************************************************************************************

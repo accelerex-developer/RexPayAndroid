@@ -3,7 +3,6 @@ package com.octacore.rexpay.utils
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import androidx.appcompat.app.AppCompatActivity
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

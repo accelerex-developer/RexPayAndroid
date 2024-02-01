@@ -2,7 +2,6 @@
 
 package com.octacore.rexpay.ui.selection
 
-import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,27 +22,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
-import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.components.PaymentManager
 import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.CustomDialog
-import com.octacore.rexpay.ui.theme.RexPayTheme
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.utils.getActivity
 

@@ -12,12 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
-import com.octacore.rexpay.domain.repo.USSDTransactionRepo
-import com.octacore.rexpay.ui.ussd.USSDState
-import com.octacore.rexpay.ui.ussd.USSDViewModel
 import com.octacore.rexpay.utils.CreditCardFormatter
 import com.octacore.rexpay.utils.ExpiryDateFormatter
-import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
