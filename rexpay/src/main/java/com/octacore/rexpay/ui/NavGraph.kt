@@ -2,7 +2,6 @@
 
 package com.octacore.rexpay.ui
 
-import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -11,9 +10,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.octacore.rexpay.DI
+import com.octacore.rexpay.RexPayApp
 import com.octacore.rexpay.domain.models.PayPayload
+import com.octacore.rexpay.ui.bankdetail.BankDetailScreen
+import com.octacore.rexpay.ui.bankdetail.BankDetailViewModel
 import com.octacore.rexpay.ui.banktransfer.BankTransferScreen
+import com.octacore.rexpay.ui.banktransfer.BankTransferViewModel
 import com.octacore.rexpay.ui.carddetail.CardDetailScreen
 import com.octacore.rexpay.ui.carddetail.CardDetailViewModel
 import com.octacore.rexpay.ui.otp.OtpScreen
@@ -32,7 +34,6 @@ import com.octacore.rexpay.ui.ussd.USSDViewModel
 
 @Composable
 internal fun AppNavGraph(
-    activity: Activity,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = NavigationItem.Selection.route + "/{reference}",
@@ -49,10 +50,9 @@ internal fun AppNavGraph(
                 defaultValue = payload?.reference
             }
         )) {
-            val factory = SelectionViewModel.provideFactory(DI.basePaymentRepo)
+            val factory = SelectionViewModel.provideFactory(RexPayApp.basePaymentRepo)
             val viewModel = viewModel<SelectionViewModel>(factory = factory)
             SelectionScreen(
-                activity = activity,
                 navController = navController,
                 viewModel = viewModel
             )
@@ -62,22 +62,37 @@ internal fun AppNavGraph(
                 type = NavType.StringType
             }
         )) {
-            val factory = CardDetailViewModel.provideFactory(DI.cardRepo)
+            val factory = CardDetailViewModel.provideFactory(RexPayApp.cardRepo)
             val viewModel: CardDetailViewModel = viewModel(factory = factory)
             CardDetailScreen(navController, vm = viewModel)
         }
         composable(NavigationItem.OTP.route) {
             OtpScreen(navController, payload)
         }
-        composable(NavigationItem.BankTransfer.route) {
-            BankTransferScreen(navController, payload)
+        composable(NavigationItem.BankTransfer.route + "/{reference}", arguments = listOf(
+            navArgument("reference") {
+                type = NavType.StringType
+            }
+        )) {
+            val factory = BankTransferViewModel.provideFactory(RexPayApp.bankRepo, RexPayApp.basePaymentRepo)
+            val viewModel: BankTransferViewModel = viewModel(factory = factory)
+            BankTransferScreen(navController, vm = viewModel)
+        }
+        composable(NavigationItem.BankTransferDetail.route + "/{reference}", arguments = listOf(
+            navArgument("reference") {
+                type = NavType.StringType
+            }
+        )) {
+            val factory = BankDetailViewModel.provideFactory(RexPayApp.bankRepo)
+            val viewModel: BankDetailViewModel = viewModel(factory = factory)
+            BankDetailScreen(navController, vm = viewModel)
         }
         composable(NavigationItem.USSD.route + "/{reference}", arguments = listOf(
             navArgument("reference") {
                 type = NavType.StringType
             }
         )) {
-            val factory = USSDViewModel.provideFactory(DI.ussdRepo)
+            val factory = USSDViewModel.provideFactory(RexPayApp.ussdRepo)
             val viewModel: USSDViewModel = viewModel(factory = factory)
             USSDScreen(navController = navController, vm = viewModel)
         }
@@ -89,6 +104,7 @@ internal enum class Screen {
     CARD_DETAIL,
     OTP,
     BANK_TRANSFER,
+    BANK_TRANSFER_DETAIL,
     USSD,
 }
 
@@ -97,5 +113,6 @@ internal sealed class NavigationItem(val route: String) {
     data object CardDetail : NavigationItem(Screen.CARD_DETAIL.name)
     data object OTP : NavigationItem(Screen.OTP.name)
     data object BankTransfer : NavigationItem(Screen.BANK_TRANSFER.name)
+    data object BankTransferDetail : NavigationItem(Screen.BANK_TRANSFER_DETAIL.name)
     data object USSD : NavigationItem(Screen.USSD.name)
 }

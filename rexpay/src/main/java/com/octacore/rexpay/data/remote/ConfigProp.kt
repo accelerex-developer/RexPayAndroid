@@ -1,21 +1,25 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay.domain.models
+package com.octacore.rexpay.data.remote
+
+import com.google.gson.annotations.SerializedName
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
  * Project         : rexpay
  * Author          : Gideon Chukwu
- * Date            : 27/01/2024
+ * Date            : 01/02/2024
  **************************************************************************************************/
-
-internal sealed class BaseResult<out T> {
-    internal data class Success<out T>(val result: T) : BaseResult<T>()
-
-    internal data class Error(
-        val message: String,
-        val code: String? = null,
-        val status: String? = null
-    ) : BaseResult<Nothing>()
+internal data class ConfigProp(
+    @SerializedName("API_USERNAME")
+    val username: String,
+    @SerializedName("API_PASSPHRASE")
+    val passphrase: String,
+    @SerializedName("API_URL")
+    val baseUrl: String
+) {
+    companion object {
+        val empty = ConfigProp(username = "", passphrase = "", baseUrl = "")
+    }
 }

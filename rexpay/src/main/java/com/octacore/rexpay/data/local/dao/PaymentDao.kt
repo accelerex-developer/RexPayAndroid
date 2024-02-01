@@ -6,9 +6,11 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import com.octacore.rexpay.data.local.entities.AccountEntity
+import com.octacore.rexpay.data.local.entities.PaymentAccountEntity
 import com.octacore.rexpay.data.local.entities.PaymentEntity
-import com.octacore.rexpay.data.local.entities.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
 /***************************************************************************************************
@@ -22,17 +24,33 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 internal interface PaymentDao {
     @Insert
-    suspend fun insert(item: PaymentEntity)
+    suspend fun insertPayment(item: PaymentEntity)
+
+    @Insert
+    suspend fun insertAccount(item: AccountEntity)
 
     @Delete
-    suspend fun delete(item: PaymentEntity)
+    suspend fun deletePayment(item: PaymentEntity)
+
+    @Delete
+    suspend fun deleteAccount(item: AccountEntity)
 
     @Update
-    suspend fun update(item: PaymentEntity)
+    suspend fun updatePayment(item: PaymentEntity)
+
+    @Update
+    suspend fun updateAccount(item: AccountEntity)
 
     @Query("SELECT * FROM payment WHERE reference = :reference")
     suspend fun fetchPaymentByRef(reference: String): PaymentEntity
 
     @Query("SELECT * FROM payment WHERE reference = :reference")
     fun fetchPaymentByRefAsync(reference: String): Flow<PaymentEntity>
+
+    @Query("SELECT * FROM payment WHERE reference = :reference")
+    suspend fun fetchPaymentAccountByRef(reference: String): PaymentAccountEntity
+
+    @Transaction
+    @Query("SELECT * FROM payment WHERE reference = :reference")
+    fun fetchPaymentAccountByRefAsync(reference: String): Flow<PaymentAccountEntity>
 }

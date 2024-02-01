@@ -5,8 +5,9 @@ package com.octacore.rexpay.data.repo
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
-import com.octacore.rexpay.domain.models.BaseResult
 import com.octacore.rexpay.data.remote.models.ErrorResponse
+import com.octacore.rexpay.domain.models.BaseResult
+import com.octacore.rexpay.domain.models.BaseResult.Error
 import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,49 +51,51 @@ internal abstract class BaseRepo {
                 if (errorBody != null) {
                     val type = object : TypeToken<ErrorResponse>() {}.type
                     val errRes = Gson().fromJson<ErrorResponse>(errorBody.charStream(), type)
-                    LogUtils.e("Transaction Error: ${errRes.responseMessage ?: "Something went wrong"}")
-                    returnRes(BaseResult.Error(errRes.responseMessage ?: "Something went wrong"))
+                    val message = errRes.responseMessage ?: "Something went wrong"
+                    LogUtils.e("Transaction Error: $message")
+                    val errMsg = Error(message, errRes.responseCode, errRes.responseStatus)
+                    returnRes(errMsg)
                 } else {
-                    LogUtils.e("Transaction Error: ${res?.message() ?: "Something went wrong"}")
-                    returnRes(BaseResult.Error(res?.message() ?: "Something went wrong"))
+                    val message = res?.message() ?: "Something went wrong"
+                    LogUtils.e("Transaction Error: $message")
+                    returnRes(Error(message = message))
                 }
             }
         } catch (e: Exception) {
             LogUtils.e("Transaction Error: ${e.message}", e)
-            return when (e) {
-                is ConnectException -> returnRes(BaseResult.Error("Unable to connect, check your connection and try again"))
-                is UnknownHostException -> returnRes(BaseResult.Error("Cannot connect to host. Try again later"))
-                is SocketTimeoutException -> returnRes(BaseResult.Error("Connection timed out! Try again"))
-                is HttpException -> {
-                    try {
-                        val msg = e.response()?.message()
-                        returnRes(BaseResult.Error(msg ?: "Something went wrong"))
-                    } catch (e: JSONException) {
-                        LogUtils.e("Transaction Error: ${e.message}", e)
-                        returnRes(BaseResult.Error("Error deserializing data"))
-                    } catch (e: IOException) {
-                        LogUtils.e("Transaction Error: ${e.message}", e)
-                        returnRes(BaseResult.Error("Error reading data"))
-                    } catch (e: SSLException) {
-                        LogUtils.e("Transaction Error: ${e.message}", e)
-                        returnRes(BaseResult.Error("Error with SSL connectivity"))
-                    } catch (e: JsonSyntaxException) {
-                        LogUtils.e("Transaction Error: ${e.message}", e)
-                        returnRes(BaseResult.Error("Error deserializing data"))
-                    } catch (e: IllegalStateException) {
-                        LogUtils.e("Transaction Error: ${e.message}", e)
-                        returnRes(BaseResult.Error("Something went wrong"))
-                    }
-                }
-
-                is SSLException -> {
-                    returnRes(BaseResult.Error("Error with SSL connectivity"))
-                }
-
-                else -> returnRes(BaseResult.Error("Something went wrong"))
+            val message = when (e) {
+                is ConnectException -> "Unable to connect, check your connection and try again"
+                is UnknownHostException -> "Cannot connect to host. Try again later"
+                is SocketTimeoutException -> "Connection timed out! Try again"
+                is HttpException -> getHttpErrorResponse(e)
+                is SSLException -> "Error with SSL connectivity"
+                else -> "Something went wrong"
             }
+            return returnRes(Error(message = message))
         } finally {
             LogUtils.i("Transaction ended")
+        }
+    }
+
+    private fun getHttpErrorResponse(e: HttpException): String {
+        return try {
+            val msg = e.response()?.message()
+            msg ?: "Something went wrong"
+        } catch (e: JSONException) {
+            LogUtils.e("Transaction Error: ${e.message}", e)
+            "Error deserializing data"
+        } catch (e: IOException) {
+            LogUtils.e("Transaction Error: ${e.message}", e)
+            "Error reading data"
+        } catch (e: SSLException) {
+            LogUtils.e("Transaction Error: ${e.message}", e)
+            "Error with SSL connectivity"
+        } catch (e: JsonSyntaxException) {
+            LogUtils.e("Transaction Error: ${e.message}", e)
+            "Error deserializing data"
+        } catch (e: IllegalStateException) {
+            LogUtils.e("Transaction Error: ${e.message}", e)
+            "Something went wrong"
         }
     }
 }

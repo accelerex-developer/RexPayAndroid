@@ -8,6 +8,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.octacore.rexpay.data.local.dao.PaymentDao
 import com.octacore.rexpay.data.local.dao.TransactionDao
+import com.octacore.rexpay.data.local.entities.AccountEntity
 import com.octacore.rexpay.data.local.entities.PaymentEntity
 import com.octacore.rexpay.data.local.entities.TransactionEntity
 
@@ -19,7 +20,14 @@ import com.octacore.rexpay.data.local.entities.TransactionEntity
  * Date            : 30/01/2024
  **************************************************************************************************/
 
-@Database(entities = [TransactionEntity::class, PaymentEntity::class], version = 1)
+@Database(
+    entities = [
+        TransactionEntity::class,
+        PaymentEntity::class,
+        AccountEntity::class,
+    ],
+    version = 1
+)
 internal abstract class RexPayDb : RoomDatabase() {
     abstract fun paymentDao(): PaymentDao
     abstract fun transactionDao(): TransactionDao
@@ -31,7 +39,9 @@ internal abstract class RexPayDb : RoomDatabase() {
         internal fun getInstance(context: Context): RexPayDb {
             return INSTANCE ?: synchronized(this) {
                 val instance =
-                    Room.databaseBuilder(context, RexPayDb::class.java, "rexpay-db").build()
+                    Room.databaseBuilder(context, RexPayDb::class.java, "rexpay-db")
+                        .fallbackToDestructiveMigration()
+                        .build()
                 INSTANCE = instance
                 instance
             }

@@ -19,6 +19,7 @@ import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.data.remote.models.UssdPaymentDetailResponse
 import com.octacore.rexpay.utils.AuthInterceptor
 import com.octacore.rexpay.utils.LogUtils
+import com.octacore.rexpay.utils.modelFromAssetFile
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -72,6 +73,8 @@ internal interface PaymentService {
         @JvmStatic
         fun getInstance(context: Context): PaymentService {
             return INSTANCE ?: synchronized(this) {
+                val fileName = "config.json"
+                val config = context.modelFromAssetFile<ConfigProp>(fileName) ?: ConfigProp.empty
 
                 val logInterceptor = HttpLoggingInterceptor()
                 if (LogUtils.showLog) {
@@ -85,7 +88,7 @@ internal interface PaymentService {
                     .connectTimeout(2, TimeUnit.MINUTES)
                     .cache(createCache(context))
                     .retryOnConnectionFailure(true)
-                    .addInterceptor(AuthInterceptor())
+                    .addInterceptor(AuthInterceptor(config))
                     .addInterceptor(logInterceptor)
                     .build()
 
@@ -95,7 +98,7 @@ internal interface PaymentService {
                     .create()
 
                 val instance = Retrofit.Builder()
-                    .baseUrl(BuildConfig.API_URL)
+                    .baseUrl(config.baseUrl)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build()

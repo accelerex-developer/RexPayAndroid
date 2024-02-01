@@ -1,5 +1,3 @@
-@file:JvmSynthetic
-
 package com.octacore.rexpay.domain.models
 
 /***************************************************************************************************
@@ -7,15 +5,23 @@ package com.octacore.rexpay.domain.models
  ***************************************************************************************************
  * Project         : rexpay
  * Author          : Gideon Chukwu
- * Date            : 27/01/2024
+ * Date            : 01/02/2024
  **************************************************************************************************/
 
-internal sealed class BaseResult<out T> {
-    internal data class Success<out T>(val result: T) : BaseResult<T>()
+sealed class PayResult {
+    data class Success(
+        val status: String?,
+    ) : PayResult()
 
-    internal data class Error(
+    data class Error(
         val message: String,
         val code: String? = null,
-        val status: String? = null
-    ) : BaseResult<Nothing>()
+        val status: String? = null,
+    ) : PayResult() {
+        internal constructor(err: BaseResult.Error?) : this(
+            message = err?.message ?: "",
+            code = err?.code,
+            status = err?.status
+        )
+    }
 }

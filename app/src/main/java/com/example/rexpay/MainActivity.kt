@@ -1,6 +1,7 @@
 package com.example.rexpay
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,12 +14,13 @@ import androidx.compose.ui.Modifier
 import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.domain.models.PayPayload
 import com.example.rexpay.ui.theme.RexAppTheme
+import com.octacore.rexpay.domain.models.PayResult
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        RexPay.init(this)
+        val rexPay = RexPay.getInstance(this)
         setContent {
             RexAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -29,20 +31,29 @@ class MainActivity : ComponentActivity() {
                     Button(
                         modifier = Modifier.wrapContentSize(),
                         onClick = {
-                            RexPay.instance.setPaymentListener(object : RexPay.RexPayListener {
-                                override fun onSuccess() {}
-                                override fun onFailure() {}
+                            rexPay.setPaymentListener(object : RexPay.RexPayListener {
+                                override fun onResult(result: PayResult) {
+                                    when (result) {
+                                        is PayResult.Error -> {
+                                            Log.e("RexPay", "Transaction Failed: $result")
+                                        }
+
+                                        is PayResult.Success -> {
+                                            Log.i("RexPay", "Transaction Success: $result")
+                                        }
+                                    }
+                                }
                             })
                             val payload = PayPayload(
                                 reference = UUID.randomUUID().toString().replace(Regex("\\W"), ""),
-                                amount = 1,
+                                amount = 100,
                                 currency = "NGN",
                                 userId = "random.user@email.com",
                                 callbackUrl = "",
                                 email = "random.user@email.com",
                                 customerName = "Random User"
                             )
-                            RexPay.instance.makePayment(payload)
+                            rexPay.makePayment(payload)
                         }
                     ) {
                         Text(text = "PAY")

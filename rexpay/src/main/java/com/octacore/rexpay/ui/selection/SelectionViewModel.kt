@@ -8,10 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.domain.models.BaseResult
-import com.octacore.rexpay.domain.repo.BasePaymentRepo
-import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.Payment
-import com.octacore.rexpay.domain.models.Transaction
+import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -47,7 +45,7 @@ internal class SelectionViewModel(
                 }
 
                 is BaseResult.Error -> {
-                    _uiState.update { it.copy(errorMsg = res.message, isLoading = false) }
+                    _uiState.update { it.copy(errorMsg = res, isLoading = false) }
                 }
             }
         }
@@ -75,6 +73,6 @@ internal class SelectionViewModel(
 
 internal data class SelectionState(
     val isLoading: Boolean = false,
-    val errorMsg: String? = null,
+    val errorMsg: BaseResult.Error? = null,
     val response: Payment? = null,
 )

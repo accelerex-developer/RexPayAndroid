@@ -7,6 +7,7 @@ import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.repo.BasePaymentRepoImpl
 import com.octacore.rexpay.domain.models.BaseResult
 import com.octacore.rexpay.domain.models.Payment
+import kotlinx.coroutines.flow.Flow
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -16,6 +17,7 @@ import com.octacore.rexpay.domain.models.Payment
  * Date            : 27/01/2024
  **************************************************************************************************/
 internal interface BasePaymentRepo {
+    fun getTransaction(reference: String): Flow<Payment>
 
     suspend fun initiatePayment(reference: String): BaseResult<Payment?>
 

@@ -53,10 +53,14 @@ internal class CardDetailViewModel(
         job?.cancel()
         job = viewModelScope.launch {
             repo.getTransaction(reference).collect { payment ->
-                LogUtils.i(payment.toString())
                 _uiState.update { it.copy(payment = payment) }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        job?.cancel()
     }
 
     internal companion object {

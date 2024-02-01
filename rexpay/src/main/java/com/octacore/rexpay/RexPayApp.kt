@@ -1,13 +1,15 @@
+@file:JvmSynthetic
+
 package com.octacore.rexpay
 
 import android.app.Application
 import android.content.Context
 import com.octacore.rexpay.data.local.RexPayDb
 import com.octacore.rexpay.data.remote.PaymentService
+import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
-import java.lang.ref.WeakReference
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -16,7 +18,7 @@ import java.lang.ref.WeakReference
  * Author          : Gideon Chukwu
  * Date            : 31/01/2024
  **************************************************************************************************/
-internal object DI {
+internal object RexPayApp {
     private lateinit var context: Application
 
     @JvmStatic
@@ -33,4 +35,6 @@ internal object DI {
     val ussdRepo by lazy { USSDTransactionRepo.getInstance(service, database) }
 
     val cardRepo by lazy { CardTransactionRepo.getInstance(service, database) }
+
+    val bankRepo by lazy { BankTransactionRepo.getInstance(service, database) }
 }

@@ -9,7 +9,6 @@ import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.ChargeUssdRequest
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
 import com.octacore.rexpay.domain.models.Payment
-import com.octacore.rexpay.domain.models.Transaction
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +55,7 @@ internal class USSDTransactionRepoImpl(
             is BaseResult.Success -> {
                 withContext(Dispatchers.IO) {
                     val data = res.result?.let { PaymentEntity(payload, it) }
-                    data?.let { paymentDao.update(it) }
+                    data?.let { paymentDao.updatePayment(it) }
                     return@withContext data
                 }
                 BaseResult.Success(null)

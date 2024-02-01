@@ -1,19 +1,16 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay.ui.ussd
+package com.octacore.rexpay.ui.bankdetail
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
+import com.octacore.rexpay.domain.models.BankAccount
 import com.octacore.rexpay.domain.models.BaseResult
-import com.octacore.rexpay.domain.models.Payment
-import com.octacore.rexpay.domain.repo.USSDTransactionRepo
-import com.octacore.rexpay.domain.models.USSDBank
-import com.octacore.rexpay.utils.LogUtils
+import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,46 +22,46 @@ import kotlinx.coroutines.launch
  ***************************************************************************************************
  * Project         : rexpay
  * Author          : Gideon Chukwu
- * Date            : 30/01/2024
+ * Date            : 01/02/2024
  **************************************************************************************************/
-internal class USSDViewModel(
-    private val repo: USSDTransactionRepo,
-    handle: SavedStateHandle,
+internal class BankDetailViewModel(
+    private val repo: BankTransactionRepo,
+    handle: SavedStateHandle
 ) : ViewModel() {
 
     private val reference: String = checkNotNull(handle["reference"])
 
-    private val _uiState = MutableStateFlow(USSDState())
+    private val _uiState = MutableStateFlow(BankDetailUiState())
     internal val uiState = _uiState.asStateFlow()
-
-    private val _selectedBank = mutableStateOf<USSDBank?>(null)
-    val selectedBank: State<USSDBank?> = _selectedBank
 
     private var job: Job? = null
 
     init {
         job?.cancel()
         job = viewModelScope.launch {
-            repo.getTransaction(reference).collect { payment ->
-                LogUtils.i(payment.toString())
-                _uiState.update { it.copy(payment = payment) }
+            repo.getAccount(reference).collect { account ->
+                _uiState.update { it.copy(account = account) }
             }
         }
     }
 
-    fun onBankSelected(bank: USSDBank?) {
-        _selectedBank.value = bank
-        if (bank != null) {
-            _uiState.update { it.copy(isLoading = true, errorMsg = null) }
-            viewModelScope.launch {
-                when (val res = repo.chargeUSSD(bank, reference)) {
-                    is BaseResult.Success -> {
-                        _uiState.update { it.copy(isLoading = false, errorMsg = null) }
-                    }
+    fun confirmTransaction() {
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            when (val res = repo.checkTransactionStatus(reference)) {
+                is BaseResult.Error -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMsg = res.message
+                    )
+                }
 
-                    is BaseResult.Error -> {
-                        _uiState.update { it.copy(errorMsg = res, isLoading = false) }
-                    }
+                is BaseResult.Success -> _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMsg = null,
+                        response = res.result
+                    )
                 }
             }
         }
@@ -76,7 +73,7 @@ internal class USSDViewModel(
     }
 
     internal companion object {
-        internal fun provideFactory(repo: USSDTransactionRepo): ViewModelProvider.Factory =
+        internal fun provideFactory(repo: BankTransactionRepo): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory, AbstractSavedStateViewModelFactory() {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(
@@ -84,14 +81,15 @@ internal class USSDViewModel(
                     modelClass: Class<T>,
                     handle: SavedStateHandle
                 ): T {
-                    return USSDViewModel(repo, handle) as T
+                    return BankDetailViewModel(repo, handle) as T
                 }
             }
     }
 }
 
-internal data class USSDState(
+internal data class BankDetailUiState(
     internal val isLoading: Boolean = false,
-    internal val errorMsg: BaseResult.Error? = null,
-    internal val payment: Payment? = null,
+    internal val errorMsg: String? = null,
+    internal val account: BankAccount? = null,
+    internal val response: TransactionStatusResponse? = null
 )

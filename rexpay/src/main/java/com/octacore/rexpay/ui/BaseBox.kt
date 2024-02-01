@@ -123,6 +123,7 @@ private fun RowScope.OptionItem(
     navHostController: NavHostController,
     reference: String?
 ) {
+    val startId = navHostController.graph.startDestinationId
     Box(
         modifier = Modifier
             .weight(1f)
@@ -130,7 +131,7 @@ private fun RowScope.OptionItem(
             .clickable {
                 val options = NavOptions
                     .Builder()
-                    .setPopUpTo(NavigationItem.Selection.route, inclusive = false)
+                    .setPopUpTo(startId, inclusive = false)
                     .setLaunchSingleTop(true)
                     .build()
                 navHostController.navigate(option.route + "/$reference", options)

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,11 +37,15 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
+import com.octacore.rexpay.RexPay
+import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.theme.RexPayTheme
 import com.octacore.rexpay.ui.theme.textBlack
+import com.octacore.rexpay.utils.getActivity
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -52,7 +57,7 @@ import com.octacore.rexpay.ui.theme.textBlack
 
 @Composable
 internal fun SelectionScreen(
-    activity: Activity,
+    manager: PaymentManager = PaymentManager.getInstance(),
     navController: NavHostController,
     viewModel: SelectionViewModel = viewModel()
 ) {
@@ -61,7 +66,8 @@ internal fun SelectionScreen(
     if (!uiState.isLoading && uiState.response == null && uiState.errorMsg == null) {
         val res = navController.navigateUp()
         if (res.not()) {
-            activity.finishAfterTransition()
+            val activity = LocalContext.current.getActivity()
+            activity?.finishAfterTransition()
         }
     } else if (uiState.isLoading) {
         Box(
@@ -77,7 +83,11 @@ internal fun SelectionScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             onDismissRequest = { },
             onPositiveClicked = { viewModel.initiateTransaction() },
-            onNegativeClicked = { viewModel.dismissError() }) {
+            onNegativeClicked = {
+                val err = PayResult.Error(uiState.errorMsg)
+                manager.onResponse(err)
+                viewModel.dismissError()
+            }) {
             val composition by rememberLottieComposition(
                 LottieCompositionSpec
                     .RawRes(R.raw.error_anim)
@@ -95,7 +105,7 @@ internal fun SelectionScreen(
             )
             Text(
                 modifier = Modifier.padding(horizontal = 24.dp),
-                text = uiState.errorMsg!!,
+                text = uiState.errorMsg?.message!!,
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
             )
@@ -148,18 +158,5 @@ private fun OptionItem(
                 contentDescription = "Forward arrow"
             )
         }
-    }
-}
-
-@Preview(
-    showBackground = true, showSystemUi = true
-)
-@Composable
-internal fun SelectionPreview() {
-    RexPayTheme {
-        SelectionScreen(
-            navController = rememberNavController(),
-            activity = Activity(),
-        )
     }
 }

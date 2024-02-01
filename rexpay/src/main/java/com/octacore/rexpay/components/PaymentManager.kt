@@ -1,40 +1,42 @@
-package com.octacore.rexpay
+@file:JvmSynthetic
+
+package com.octacore.rexpay.components
 
 import android.content.Context
-import com.octacore.rexpay.data.RexPayImpl
 import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.domain.models.PayResult
-import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
  * Project         : rexpay
  * Author          : Gideon Chukwu
- * Date            : 17/01/2024
+ * Date            : 01/02/2024
  **************************************************************************************************/
-interface RexPay {
+internal interface PaymentManager {
+    fun startActivity(context: Context, payload: PayPayload)
 
-    fun makePayment(payload: PayPayload)
+    fun onResponse(result: PayResult)
 
-    fun setPaymentListener(listener: RexPayListener)
+    fun setOnResultListener(listener: Listener)
+
+    interface Listener {
+        fun onResult(result: PayResult)
+    }
 
     companion object {
-        private var INSTANCE: RexPay? = null
+        const val PAYMENT_PAYLOAD = "payment_payload"
+
+        @Volatile
+        private var INSTANCE: PaymentManager? = null
 
         @JvmStatic
-        fun getInstance(context: Context, showLog: Boolean = BuildConfig.DEBUG): RexPay {
+        fun getInstance(): PaymentManager {
             return INSTANCE ?: synchronized(this) {
-                RexPayApp.init(context)
-                LogUtils.init(showLog = showLog)
-                val instance = RexPayImpl(context, RexPayApp.database)
+                val instance = PaymentManagerImpl()
                 INSTANCE = instance
                 instance
             }
         }
-    }
-
-    interface RexPayListener {
-        fun onResult(result: PayResult)
     }
 }

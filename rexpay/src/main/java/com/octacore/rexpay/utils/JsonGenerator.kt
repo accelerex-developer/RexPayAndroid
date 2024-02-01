@@ -18,13 +18,27 @@ import java.io.IOException
 
 internal inline fun <reified T> Context.listFromAsset(fileName: String): List<T> {
     val finalList = mutableListOf<T>()
-    val jsonArray =
-        JsonParser.parseString(readAssetsTxt(fileName, this)).asJsonArray
-    for (item in jsonArray) {
-        val bean = Gson().fromJson(item, T::class.java)
-        finalList.add(bean)
+    try {
+        val parsedFile = readAssetsTxt(fileName, this)
+        val jsonArray = JsonParser.parseString(parsedFile).asJsonArray
+        for (item in jsonArray) {
+            val bean = Gson().fromJson(item, T::class.java)
+            finalList.add(bean)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
-    return finalList
+    return finalList.toList()
+}
+
+internal inline fun <reified T> Context.modelFromAssetFile(fileName: String): T? {
+    val parsedFile = readAssetsTxt(fileName, this)
+    val jsonItem = JsonParser.parseString(parsedFile).asJsonObject
+    return try {
+        Gson().fromJson(jsonItem, T::class.java)
+    } catch (e: Exception) {
+        null
+    }
 }
 
 private fun readAssetsTxt(fileName: String, context: Context): String? {

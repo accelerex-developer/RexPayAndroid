@@ -16,14 +16,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.rememberNavController
 import com.octacore.rexpay.R
-import com.octacore.rexpay.RexPay
-import com.octacore.rexpay.RexPay.Companion.PAYMENT_PAYLOAD
+import com.octacore.rexpay.components.PaymentManager.Companion.PAYMENT_PAYLOAD
 import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.ui.theme.RexPayTheme
 
 internal class PaymentActivity : ComponentActivity() {
-    private val rexPay = RexPay.instance
-
     private val payload by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra(PAYMENT_PAYLOAD, PayPayload::class.java)
@@ -49,7 +46,6 @@ internal class PaymentActivity : ComponentActivity() {
                             alpha = 0.08F,
                         )
                         AppNavGraph(
-                            activity = this@PaymentActivity,
                             navController = rememberNavController(),
                             modifier = Modifier.matchParentSize(),
                             payload = payload
