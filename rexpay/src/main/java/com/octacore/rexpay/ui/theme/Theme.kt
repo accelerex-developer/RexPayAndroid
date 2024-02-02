@@ -44,6 +44,6 @@ internal fun RexPayTheme(
     MaterialTheme(
         colors = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

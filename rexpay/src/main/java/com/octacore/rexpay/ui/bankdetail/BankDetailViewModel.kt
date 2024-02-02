@@ -46,13 +46,13 @@ internal class BankDetailViewModel(
     }
 
     fun confirmTransaction() {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { BankDetailUiState(isLoading = true, account = it.account) }
         viewModelScope.launch {
             when (val res = repo.checkTransactionStatus(reference)) {
                 is BaseResult.Error -> _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMsg = res.message
+                        errorMsg = res
                     )
                 }
 
@@ -66,6 +66,8 @@ internal class BankDetailViewModel(
             }
         }
     }
+
+    fun reset() = _uiState.update { BankDetailUiState(account = it.account) }
 
     override fun onCleared() {
         super.onCleared()
@@ -89,7 +91,7 @@ internal class BankDetailViewModel(
 
 internal data class BankDetailUiState(
     internal val isLoading: Boolean = false,
-    internal val errorMsg: String? = null,
+    internal val errorMsg: BaseResult.Error? = null,
     internal val account: BankAccount? = null,
     internal val response: TransactionStatusResponse? = null
 )

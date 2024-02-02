@@ -51,7 +51,7 @@ internal fun BankTransferScreen(
             .setLaunchSingleTop(true)
             .build()
         navController.navigate(
-            NavigationItem.BankTransferDetail.route + "/${uiState.payment?.reference}",
+            NavigationItem.BankDetailScreen.route + "/${uiState.payment?.reference}",
             options
         )
         vm.reset()

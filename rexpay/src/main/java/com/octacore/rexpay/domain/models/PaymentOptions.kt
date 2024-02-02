@@ -27,7 +27,7 @@ internal sealed class PaymentOptions(
             id = 0,
             icon = R.drawable.ic_credit_card,
             title = "Pay with Card",
-            route = NavigationItem.CardDetail.route,
+            route = NavigationItem.CardDetailScreen.route,
             active = true,
             shortName = "Card"
         )
@@ -38,7 +38,7 @@ internal sealed class PaymentOptions(
         title = "Pay with USSD",
         active = true,
         shortName = "USSD",
-        route = NavigationItem.USSD.route
+        route = NavigationItem.USSDScreen.route
     )
 
     internal data object BankOption : PaymentOptions(
@@ -47,7 +47,7 @@ internal sealed class PaymentOptions(
         title = "Pay with Bank",
         active = true,
         shortName = "Bank",
-        route = NavigationItem.BankTransfer.route
+        route = NavigationItem.BankTransferScreen.route
     )
 
     internal data object MobileMoneyOption : PaymentOptions(

@@ -34,7 +34,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
 import com.octacore.rexpay.ui.NavigationItem
@@ -133,7 +132,7 @@ internal fun CardDetailScreen(
                         val options = NavOptions.Builder()
                             .setLaunchSingleTop(true)
                             .build()
-                        navController.navigate(NavigationItem.OTP.route, options)
+                        navController.navigate(NavigationItem.OTPScreen.route, options)
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Red,

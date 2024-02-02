@@ -39,8 +39,8 @@ internal fun CustomDialog(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    positiveText: String,
-    negativeText: String,
+    positiveText: String? = null,
+    negativeText: String? = null,
     onDismissRequest: () -> Unit,
     onPositiveClicked: () -> Unit,
     onNegativeClicked: () -> Unit,
@@ -69,21 +69,25 @@ internal fun CustomDialog(
                             .background(Purple80),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        TextButton(onClick = onNegativeClicked) {
-                            Text(
-                                negativeText,
-                                fontWeight = FontWeight.Bold,
-                                color = PurpleGrey40,
-                                modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
-                            )
+                        if (negativeText != null) {
+                            TextButton(onClick = onNegativeClicked) {
+                                Text(
+                                    negativeText,
+                                    fontWeight = FontWeight.W500,
+                                    color = PurpleGrey40,
+                                    modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
+                                )
+                            }
                         }
-                        TextButton(onClick = onPositiveClicked) {
-                            Text(
-                                positiveText,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.Black,
-                                modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
-                            )
+                        if (positiveText != null) {
+                            TextButton(onClick = onPositiveClicked) {
+                                Text(
+                                    positiveText,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(top = 5.dp, bottom = 5.dp)
+                                )
+                            }
                         }
                     }
                 }

@@ -36,6 +36,7 @@ import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
 import com.octacore.rexpay.utils.StringUtil
+import com.octacore.rexpay.utils.StringUtil.formatToNaira
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -67,7 +68,7 @@ internal fun BaseBox(
                 .wrapContentSize()
         ) {
             Text(
-                text = StringUtil.formatToNaira(payment?.amount),
+                text = payment?.amount.formatToNaira(),
                 modifier = Modifier.padding(top = 8.dp),
                 fontWeight = FontWeight.W600,
                 fontSize = 20.sp,

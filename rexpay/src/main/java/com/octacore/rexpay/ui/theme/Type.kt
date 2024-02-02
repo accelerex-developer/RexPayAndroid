@@ -52,5 +52,10 @@ internal val Typography = Typography(
         fontSize = 11.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
+    ),
+    button = TextStyle(
+        fontFamily = PoppinsFamily,
+        fontSize = 14.sp,
+        letterSpacing = 0.5.sp,
     )
 )
