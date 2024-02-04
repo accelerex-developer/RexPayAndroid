@@ -5,7 +5,7 @@
 
     <application>
         <activity
-            android:name=".ui.PaymentActivity"
+            android:name=".RexPayActivity"
             android:exported="false"
             android:label="@string/title_activity_payment"
             android:theme="@style/Theme.Rexpay" />

@@ -1,29 +1,40 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay.domain.repo
+package com.octacore.rexpay.data.cache
 
-import com.octacore.rexpay.data.remote.PaymentService
-import com.octacore.rexpay.data.repo.CardTransactionRepoImpl
+import com.octacore.rexpay.domain.models.PayPayload
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
  * Project         : rexpay
  * Author          : Gideon Chukwu
- * Date            : 27/01/2024
+ * Date            : 03/02/2024
  **************************************************************************************************/
-internal interface CardTransactionRepo {
 
-//    fun getTransaction(reference: String): Flow<Payment>
+
+internal interface Cache {
+
+    var payload: PayPayload?
+
+    var ussdCode: String?
+
+    /*fun setPayload(value: PayPayload?)
+
+    fun setUssdCode(value: String?)
+
+    fun getPayload(): PayPayload?
+
+    fun getUssdCode(): String?*/
 
     companion object {
         @Volatile
-        private var INSTANCE: CardTransactionRepo? = null
+        private var INSTANCE: Cache? = null
 
         @JvmStatic
-        fun getInstance(service: PaymentService): CardTransactionRepo {
+        fun getInstance(): Cache {
             return INSTANCE ?: synchronized(this) {
-                val instance = CardTransactionRepoImpl(service)
+                val instance = CacheManager()
                 INSTANCE = instance
                 instance
             }

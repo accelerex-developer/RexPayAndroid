@@ -14,13 +14,20 @@ import androidx.compose.ui.Modifier
 import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.domain.models.PayPayload
 import com.example.rexpay.ui.theme.RexAppTheme
+import com.octacore.rexpay.domain.models.ConfigProp
 import com.octacore.rexpay.domain.models.PayResult
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val rexPay = RexPay.getInstance(this)
+        val config = ConfigProp.Builder()
+            .username("talk2phasahsyyahoocom")
+            .passphrase("f0bedbea93df09264a4f09a6b38de6e9b924b6cb92bf4a0c07ce46f26f85")
+            .baseUrl("https://pgs-sandbox.globalaccelerex.com/api/")
+            .build()
+
+        RexPay.init(this, config)
         setContent {
             RexAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -31,6 +38,7 @@ class MainActivity : ComponentActivity() {
                     Button(
                         modifier = Modifier.wrapContentSize(),
                         onClick = {
+                            val rexPay = RexPay.getInstance()
                             rexPay.setPaymentListener(object : RexPay.RexPayListener {
                                 override fun onResult(result: PayResult) {
                                     when (result) {
@@ -53,7 +61,7 @@ class MainActivity : ComponentActivity() {
                                 email = "random.user@email.com",
                                 customerName = "Random User"
                             )
-                            rexPay.makePayment(payload)
+                            rexPay.makePayment(this, payload)
                         }
                     ) {
                         Text(text = "PAY")

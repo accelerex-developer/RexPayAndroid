@@ -2,8 +2,6 @@
 
 package com.octacore.rexpay.domain.models
 
-import com.octacore.rexpay.data.local.entities.PaymentEntity
-
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
@@ -26,21 +24,4 @@ internal data class Payment(
     internal val paymentUrlReference: String? = null,
     internal val externalPaymentReference: String? = null,
     internal val fees: Double? = null,
-) {
-    internal constructor(pay: PaymentEntity?): this(
-        reference = pay?.reference ?: "",
-        amount = pay?.amount ?: 0L,
-        currency = pay?.currency ?: "",
-        userId = pay?.userId ?: "",
-        callbackUrl = pay?.callbackUrl ?: "",
-        email = pay?.email ?: "",
-        customerName = pay?.customerName ?: "",
-        clientId = pay?.clientId,
-        paymentUrl = pay?.paymentUrl,
-        status = pay?.status,
-        paymentChannel = pay?.paymentChannel,
-        paymentUrlReference = pay?.paymentUrlReference,
-        externalPaymentReference = pay?.externalPaymentReference,
-        fees = pay?.fees
-    )
-}
+)

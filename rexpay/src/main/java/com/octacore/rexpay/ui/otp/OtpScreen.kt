@@ -23,12 +23,11 @@ import com.octacore.rexpay.ui.BaseTopNav
 @Composable
 internal fun OtpScreen(
     navController: NavHostController,
-    payload: PayPayload?,
     vm: OtpViewModel = viewModel(),
 ) {
     Column(verticalArrangement = Arrangement.Center) {
         BaseTopNav(navController = navController)
-        BaseBox(payment = null, elevation = 2.dp) {
+        BaseBox(elevation = 2.dp) {
 
         }
     }

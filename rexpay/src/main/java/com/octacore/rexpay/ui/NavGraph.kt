@@ -6,12 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.octacore.rexpay.RexPayApp
-import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.ui.bankdetail.BankDetailScreen
 import com.octacore.rexpay.ui.bankdetail.BankDetailViewModel
 import com.octacore.rexpay.ui.banktransfer.BankTransferScreen
@@ -19,8 +16,6 @@ import com.octacore.rexpay.ui.banktransfer.BankTransferViewModel
 import com.octacore.rexpay.ui.carddetail.CardDetailScreen
 import com.octacore.rexpay.ui.carddetail.CardDetailViewModel
 import com.octacore.rexpay.ui.otp.OtpScreen
-import com.octacore.rexpay.ui.selection.SelectionScreen
-import com.octacore.rexpay.ui.selection.SelectionViewModel
 import com.octacore.rexpay.ui.ussd.USSDScreen
 import com.octacore.rexpay.ui.ussd.USSDViewModel
 
@@ -36,72 +31,38 @@ import com.octacore.rexpay.ui.ussd.USSDViewModel
 internal fun AppNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: String = NavigationItem.SelectionScreen.route + "/{reference}",
-    payload: PayPayload?,
+    startDestination: String = NavigationItem.SelectionScreen.route,
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        composable(NavigationItem.SelectionScreen.route + "/{reference}", arguments = listOf(
-            navArgument("reference") {
-                type = NavType.StringType
-                defaultValue = payload?.reference
-            }
-        )) {
-            val factory = SelectionViewModel.provideFactory(RexPayApp.basePaymentRepo)
-            val viewModel = viewModel<SelectionViewModel>(factory = factory)
-            SelectionScreen(
-                navController = navController,
-                viewModel = viewModel
-            )
-        }
-        composable(NavigationItem.CardDetailScreen.route + "/{reference}", arguments = listOf(
-            navArgument("reference") {
-                type = NavType.StringType
-            }
-        )) {
+        composable(NavigationItem.SelectionScreen.route) { SelectionScreen(navController = navController) }
+        composable(NavigationItem.CardDetailScreen.route) {
             val factory = CardDetailViewModel.provideFactory(RexPayApp.cardRepo)
-            val viewModel: CardDetailViewModel = viewModel(factory = factory)
+            val viewModel = viewModel<CardDetailViewModel>(factory = factory)
             CardDetailScreen(navController, vm = viewModel)
         }
-        composable(NavigationItem.OTPScreen.route) {
-            OtpScreen(navController, payload)
-        }
-        composable(NavigationItem.BankTransferScreen.route + "/{reference}", arguments = listOf(
-            navArgument("reference") {
-                type = NavType.StringType
-            }
-        )) {
+        composable(NavigationItem.OTPScreen.route) { OtpScreen(navController) }
+        composable(NavigationItem.BankTransferScreen.route) {
             val factory =
                 BankTransferViewModel.provideFactory(RexPayApp.bankRepo, RexPayApp.basePaymentRepo)
-            val viewModel: BankTransferViewModel = viewModel(factory = factory)
+            val viewModel = viewModel<BankTransferViewModel>(factory = factory)
             BankTransferScreen(navController, vm = viewModel)
         }
-        composable(NavigationItem.BankDetailScreen.route + "/{reference}", arguments = listOf(
-            navArgument("reference") {
-                type = NavType.StringType
-            }
-        )) {
+        composable(NavigationItem.BankDetailScreen.route) {
             val factory = BankDetailViewModel.provideFactory(RexPayApp.bankRepo)
-            val viewModel: BankDetailViewModel = viewModel(factory = factory)
+            val viewModel = viewModel<BankDetailViewModel>(factory = factory)
             BankDetailScreen(navController, vm = viewModel)
         }
-        composable(NavigationItem.USSDScreen.route + "/{reference}", arguments = listOf(
-            navArgument("reference") {
-                type = NavType.StringType
-            }
-        )) {
-            val factory = USSDViewModel.provideFactory(RexPayApp.ussdRepo)
-            val viewModel: USSDViewModel = viewModel(factory = factory)
+        composable(NavigationItem.USSDScreen.route) {
+            val factory =
+                USSDViewModel.provideFactory(RexPayApp.ussdRepo, RexPayApp.basePaymentRepo)
+            val viewModel = viewModel<USSDViewModel>(factory = factory)
             USSDScreen(navController = navController, vm = viewModel)
         }
-        composable(NavigationItem.SuccessScreen.route + "/{amount}", arguments = listOf(
-            navArgument("amount") {
-                type = NavType.LongType
-            }
-        )) {backStackEntry ->
+        composable(NavigationItem.SuccessScreen.route) { backStackEntry ->
             val amount = backStackEntry.arguments?.getLong("amount", 0L)
             SuccessScreen(navController = navController, amount = amount)
         }

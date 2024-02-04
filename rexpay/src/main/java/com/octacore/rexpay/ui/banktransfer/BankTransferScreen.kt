@@ -14,16 +14,27 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.octacore.rexpay.R
+import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
+import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.NavigationItem
 import com.octacore.rexpay.ui.theme.Red
 
@@ -39,11 +50,20 @@ import com.octacore.rexpay.ui.theme.Red
 internal fun BankTransferScreen(
     navController: NavHostController,
     vm: BankTransferViewModel = viewModel(),
+    manager: PaymentManager = PaymentManager.getInstance()
 ) {
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 
     if (uiState.errorMsg != null) {
-
+        ErrorDialog(
+            onClose = {
+                val err = PayResult.Error(uiState.errorMsg)
+                manager.onResponse(err)
+                vm.reset()
+            },
+            onContinue = {  },
+            message = uiState.errorMsg?.message ?: "Something went wrong"
+        )
     }
 
     if (uiState.account != null) {
@@ -59,7 +79,7 @@ internal fun BankTransferScreen(
 
     Column(verticalArrangement = Arrangement.Center) {
         BaseTopNav(navController = navController, reference = uiState.payment?.reference)
-        BaseBox(payment = uiState.payment, elevation = 2.dp) {
+        /*BaseBox(payment = uiState.payment, elevation = 2.dp) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Kindly click the button to get account details",
@@ -88,6 +108,44 @@ internal fun BankTransferScreen(
                     }
                 )
             }
-        }
+        }*/
+    }
+}
+
+@Composable
+private fun ErrorDialog(
+    onClose: () -> Unit,
+    onContinue: () -> Unit,
+    message: String,
+) {
+    CustomDialog(
+        positiveText = "Retry",
+        negativeText = "Cancel",
+        horizontalAlignment = Alignment.CenterHorizontally,
+        onDismissRequest = { },
+        onPositiveClicked = onContinue,
+        onNegativeClicked = onClose
+    ) {
+        val composition by rememberLottieComposition(
+            LottieCompositionSpec
+                .RawRes(R.raw.error_anim)
+        )
+        val progress by animateLottieCompositionAsState(
+            composition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true,
+            restartOnPlay = false
+        )
+        LottieAnimation(
+            composition,
+            progress,
+            modifier = Modifier.size(120.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = message,
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+        )
     }
 }

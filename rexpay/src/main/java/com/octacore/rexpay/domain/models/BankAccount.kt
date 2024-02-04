@@ -2,8 +2,6 @@
 
 package com.octacore.rexpay.domain.models
 
-import com.octacore.rexpay.data.local.entities.AccountEntity
-
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
@@ -17,13 +15,4 @@ internal data class BankAccount(
     internal val accountName: String,
     internal val accountNumber: String,
     internal val reference: String,
-) {
-    var payment: Payment? = null
-    constructor(entity: AccountEntity?): this(
-        id = entity?.id ?: 0L,
-        bankName = entity?.bankName ?: "",
-        accountName = entity?.accountName ?: "",
-        accountNumber = entity?.accountNumber ?: "",
-        reference = entity?.transactionReference ?: ""
-    )
-}
+)

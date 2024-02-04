@@ -4,12 +4,14 @@ package com.octacore.rexpay
 
 import android.app.Application
 import android.content.Context
-import com.octacore.rexpay.data.local.RexPayDb
+import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.data.remote.PaymentService
+import com.octacore.rexpay.domain.models.ConfigProp
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
+import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -21,20 +23,21 @@ import com.octacore.rexpay.domain.repo.USSDTransactionRepo
 internal object RexPayApp {
     private lateinit var context: Application
 
+    private lateinit var config: ConfigProp
+
     @JvmStatic
-    fun init(context: Context) {
+    fun init(context: Context, config: ConfigProp) {
         this.context = context.applicationContext as Application
+        this.config = config
     }
 
-    private val service by lazy { PaymentService.getInstance(context) }
+    private val service by lazy { PaymentService.getInstance(context, config) }
 
-    val database by lazy { RexPayDb.getInstance(context) }
+    val basePaymentRepo by lazy { BasePaymentRepo.getInstance(service) }
 
-    val basePaymentRepo by lazy { BasePaymentRepo.getInstance(service, database) }
+    val ussdRepo by lazy { USSDTransactionRepo.getInstance(service) }
 
-    val ussdRepo by lazy { USSDTransactionRepo.getInstance(service, database) }
+    val cardRepo by lazy { CardTransactionRepo.getInstance(service) }
 
-    val cardRepo by lazy { CardTransactionRepo.getInstance(service, database) }
-
-    val bankRepo by lazy { BankTransactionRepo.getInstance(service, database) }
+    val bankRepo by lazy { BankTransactionRepo.getInstance(service) }
 }

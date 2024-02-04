@@ -29,10 +29,7 @@ import kotlinx.coroutines.launch
 internal class BankTransferViewModel(
     private val repo: BankTransactionRepo,
     private val baseRepo: BasePaymentRepo,
-    handle: SavedStateHandle,
 ) : ViewModel() {
-
-    private val reference: String = checkNotNull(handle["reference"])
 
     private val _uiState = MutableStateFlow(BankTransferState())
     internal val uiState = _uiState.asStateFlow()
@@ -41,18 +38,18 @@ internal class BankTransferViewModel(
 
     init {
         job?.cancel()
-        job = viewModelScope.launch {
+        /*job = viewModelScope.launch {
             baseRepo.getTransaction(reference).collect { payment ->
                 LogUtils.i(payment.toString())
                 _uiState.update { it.copy(payment = payment) }
             }
-        }
+        }*/
     }
 
     internal fun initiate() {
         _uiState.update { BankTransferState(isLoading = true, payment = it.payment) }
         viewModelScope.launch {
-            when (val res = repo.initiateBankTransfer(reference)) {
+            when (val res = repo.initiateBankTransfer()) {
                 is BaseResult.Error -> _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -83,14 +80,10 @@ internal class BankTransferViewModel(
             repo: BankTransactionRepo,
             baseRepo: BasePaymentRepo,
         ): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory, AbstractSavedStateViewModelFactory() {
+            object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(
-                    key: String,
-                    modelClass: Class<T>,
-                    handle: SavedStateHandle
-                ): T {
-                    return BankTransferViewModel(repo, baseRepo, handle) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return BankTransferViewModel(repo, baseRepo) as T
                 }
             }
     }

@@ -16,6 +16,7 @@ import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.TransactionStatusRequest
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.data.remote.models.UssdPaymentDetailResponse
+import com.octacore.rexpay.domain.models.ConfigProp
 import com.octacore.rexpay.utils.AuthInterceptor
 import com.octacore.rexpay.utils.LogUtils
 import com.octacore.rexpay.utils.modelFromAssetFile
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit
  **************************************************************************************************/
 internal interface PaymentService {
     @POST("pgs/payment/v2/createPayment")
-    suspend fun createPayment(@Body request: PaymentCreationRequest): Response<PaymentCreationResponse?>
+    suspend fun createPayment(@Body request: PaymentCreationRequest?): Response<PaymentCreationResponse?>
 
     @POST("cps/v1/chargeCard")
     suspend fun chargeCard(@Body request: EncryptedRequest): Response<EncryptedResponse?>
@@ -51,16 +52,19 @@ internal interface PaymentService {
     suspend fun authorizeTransaction(@Body request: EncryptedRequest): Response<EncryptedResponse?>
 
     @POST("cps/v1/initiateBankTransfer")
-    suspend fun chargeBank(@Body request: ChargeBankRequest): Response<ChargeBankResponse?>
+    suspend fun chargeBank(@Body request: ChargeBankRequest?): Response<ChargeBankResponse?>
 
     @POST("cps/v1/getTransactionStatus")
     suspend fun fetchTransactionStatus(@Body request: TransactionStatusRequest): Response<TransactionStatusResponse?>
 
     @POST("pgs/payment/v1/makePayment")
-    suspend fun chargeUssd(@Body request: ChargeUssdRequest): Response<ChargeUssdResponse?>
+    suspend fun chargeUssd(@Body request: ChargeUssdRequest?): Response<ChargeUssdResponse?>
 
-    @GET("pgs/payment/v1/getPaymentDetails/{TransRef}")
-    suspend fun fetchUssdPaymentDetail(@Path("TransRef") reference: String): Response<UssdPaymentDetailResponse?>
+    @GET("pgs/payment/v1/getPaymentDetails/{clientId}/{trans}")
+    suspend fun fetchUssdPaymentDetail(
+        @Path("trans") reference: String,
+        @Path("clientId") clientId: String
+    ): Response<UssdPaymentDetailResponse?>
 
     @POST("pgs/clients/v1/publicKey")
     suspend fun insertPublicKey(@Body request: KeyRequest): Response<Nothing?>
@@ -70,10 +74,8 @@ internal interface PaymentService {
         private var INSTANCE: PaymentService? = null
 
         @JvmStatic
-        fun getInstance(context: Context): PaymentService {
+        fun getInstance(context: Context, config: ConfigProp): PaymentService {
             return INSTANCE ?: synchronized(this) {
-                val fileName = "config.json"
-                val config = context.modelFromAssetFile<ConfigProp>(fileName) ?: ConfigProp.empty
 
                 val logInterceptor = HttpLoggingInterceptor()
                 if (LogUtils.showLog) {

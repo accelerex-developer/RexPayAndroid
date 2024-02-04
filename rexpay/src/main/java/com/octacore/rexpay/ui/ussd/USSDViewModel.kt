@@ -13,6 +13,7 @@ import com.octacore.rexpay.domain.models.BaseResult
 import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
 import com.octacore.rexpay.domain.models.USSDBank
+import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,12 +30,10 @@ import kotlinx.coroutines.launch
  **************************************************************************************************/
 internal class USSDViewModel(
     private val repo: USSDTransactionRepo,
-    handle: SavedStateHandle,
+    baseRepo: BasePaymentRepo,
 ) : ViewModel() {
 
-    private val reference: String = checkNotNull(handle["reference"])
-
-    private val _uiState = MutableStateFlow(USSDState())
+    private val _uiState = MutableStateFlow(USSDUiState())
     internal val uiState = _uiState.asStateFlow()
 
     private val _selectedBank = mutableStateOf<USSDBank?>(null)
@@ -44,29 +43,43 @@ internal class USSDViewModel(
 
     init {
         job?.cancel()
-        job = viewModelScope.launch {
-            repo.getTransaction(reference).collect { payment ->
-                LogUtils.i(payment.toString())
+        /*job = viewModelScope.launch {
+            baseRepo.getTransaction(reference).collect { payment ->
+                LogUtils.i("USSDViewModel: $payment")
                 _uiState.update { it.copy(payment = payment) }
             }
-        }
+        }*/
     }
 
     fun onBankSelected(bank: USSDBank?) {
         _selectedBank.value = bank
         if (bank != null) {
-            _uiState.update { it.copy(isLoading = true, errorMsg = null) }
+            _uiState.update { it.copy(isLoading = true, errorMsg = null, code = null) }
             viewModelScope.launch {
-                when (val res = repo.chargeUSSD(bank, reference)) {
+                when (val res = repo.chargeUSSD(bank)) {
                     is BaseResult.Success -> {
-                        _uiState.update { it.copy(isLoading = false, errorMsg = null) }
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMsg = null,
+                                code = res.result
+                            )
+                        }
                     }
 
                     is BaseResult.Error -> {
-                        _uiState.update { it.copy(errorMsg = res, isLoading = false) }
+                        _uiState.update {
+                            it.copy(
+                                errorMsg = res,
+                                isLoading = false,
+                                code = null
+                            )
+                        }
                     }
                 }
             }
+        } else {
+            _uiState.update { USSDUiState(payment = it.payment) }
         }
     }
 
@@ -76,22 +89,22 @@ internal class USSDViewModel(
     }
 
     internal companion object {
-        internal fun provideFactory(repo: USSDTransactionRepo): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory, AbstractSavedStateViewModelFactory() {
+        internal fun provideFactory(
+            repo: USSDTransactionRepo,
+            baseRepo: BasePaymentRepo
+        ): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(
-                    key: String,
-                    modelClass: Class<T>,
-                    handle: SavedStateHandle
-                ): T {
-                    return USSDViewModel(repo, handle) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return USSDViewModel(repo, baseRepo) as T
                 }
             }
     }
 }
 
-internal data class USSDState(
+internal data class USSDUiState(
     internal val isLoading: Boolean = false,
+    internal val code: String? = null,
     internal val errorMsg: BaseResult.Error? = null,
     internal val payment: Payment? = null,
 )

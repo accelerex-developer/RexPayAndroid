@@ -2,8 +2,6 @@
 
 package com.octacore.rexpay.data.remote.models
 
-import com.octacore.rexpay.data.local.entities.PaymentEntity
-
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
@@ -22,17 +20,5 @@ internal data class PaymentCreationRequest(
     internal data class MetaData(
         internal val email: String?,
         internal val customerName: String?,
-    )
-
-    internal constructor(data: PaymentEntity?) : this(
-        reference = data?.reference,
-        amount = data?.amount,
-        currency = data?.currency,
-        userId = data?.userId,
-        callbackUrl = data?.callbackUrl,
-        metaData = MetaData(
-            email = data?.email,
-            customerName = data?.customerName
-        )
     )
 }

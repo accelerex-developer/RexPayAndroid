@@ -2,7 +2,7 @@
 
 package com.octacore.rexpay.utils
 
-import com.octacore.rexpay.data.remote.ConfigProp
+import com.octacore.rexpay.domain.models.ConfigProp
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.Response

@@ -38,11 +38,11 @@ internal class BankDetailViewModel(
 
     init {
         job?.cancel()
-        job = viewModelScope.launch {
+        /*job = viewModelScope.launch {
             repo.getAccount(reference).collect { account ->
                 _uiState.update { it.copy(account = account) }
             }
-        }
+        }*/
     }
 
     fun confirmTransaction() {

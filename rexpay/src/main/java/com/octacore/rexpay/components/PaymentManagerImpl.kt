@@ -2,10 +2,8 @@ package com.octacore.rexpay.components
 
 import android.content.Context
 import android.content.Intent
-import com.octacore.rexpay.components.PaymentManager.Companion.PAYMENT_PAYLOAD
-import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.domain.models.PayResult
-import com.octacore.rexpay.ui.PaymentActivity
+import com.octacore.rexpay.RexPayActivity
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -18,9 +16,8 @@ internal class PaymentManagerImpl : PaymentManager {
 
     private var listener: PaymentManager.Listener? = null
 
-    override fun startActivity(context: Context, payload: PayPayload) {
-        val intent = Intent(context, PaymentActivity::class.java)
-        intent.putExtra(PAYMENT_PAYLOAD, payload)
+    override fun startActivity(context: Context) {
+        val intent = Intent(context, RexPayActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
     }

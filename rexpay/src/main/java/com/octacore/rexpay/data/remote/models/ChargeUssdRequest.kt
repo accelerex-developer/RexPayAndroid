@@ -2,8 +2,6 @@
 
 package com.octacore.rexpay.data.remote.models
 
-import com.octacore.rexpay.data.local.entities.PaymentEntity
-
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
@@ -21,16 +19,4 @@ internal data class ChargeUssdRequest(
     internal val reference: String?,
     internal val userId: String?,
     internal val callbackUrl: String?,
-) {
-    constructor(payment: PaymentEntity?, code: String?) : this(
-        amount = payment?.amount,
-        bankCode = code,
-        clientId = payment?.clientId,
-        currency = payment?.currency,
-        paymentChannel = "USSD",
-        paymentUrl = payment?.paymentUrl,
-        reference = payment?.reference,
-        userId = payment?.userId,
-        callbackUrl = payment?.callbackUrl,
-    )
-}
+)

@@ -31,11 +31,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.octacore.rexpay.R
+import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
-import com.octacore.rexpay.utils.StringUtil
+import com.octacore.rexpay.utils.LogUtils
 import com.octacore.rexpay.utils.StringUtil.formatToNaira
 
 /***************************************************************************************************
@@ -48,8 +49,9 @@ import com.octacore.rexpay.utils.StringUtil.formatToNaira
 
 @Composable
 internal fun BaseBox(
-    payment: Payment?,
     modifier: Modifier = Modifier,
+    amount: Number = 0,
+    userInfo: String = "",
     elevation: Dp = 0.5.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -68,14 +70,14 @@ internal fun BaseBox(
                 .wrapContentSize()
         ) {
             Text(
-                text = payment?.amount.formatToNaira(),
+                text = amount.formatToNaira(),
                 modifier = Modifier.padding(top = 8.dp),
                 fontWeight = FontWeight.W600,
                 fontSize = 20.sp,
                 color = textBlack
             )
             Text(
-                text = getTitle(payment),
+                text = userInfo,
                 fontSize = 12.sp,
                 color = textGray
             )
@@ -151,7 +153,7 @@ private fun RowScope.OptionItem(
     }
 }
 
-private fun getTitle(payload: Payment?): String {
+private fun getTitle(payload: PayPayload?): String {
     return when {
         payload?.userId.isNullOrEmpty().not() -> payload?.userId
         payload?.email.isNullOrEmpty().not() -> payload?.email

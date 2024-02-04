@@ -2,12 +2,16 @@
 
 package com.octacore.rexpay.ui.ussd
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
@@ -16,6 +20,7 @@ import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,8 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,6 +43,9 @@ import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
+import com.octacore.rexpay.ui.theme.PoppinsFamily
+import com.octacore.rexpay.ui.theme.PurpleGrey40
+import com.octacore.rexpay.ui.theme.Red
 import com.octacore.rexpay.ui.theme.lineGray
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
@@ -58,7 +69,7 @@ internal fun USSDScreen(
 
     Column(verticalArrangement = Arrangement.Center) {
         BaseTopNav(navController = navController, reference = uiState.payment?.reference)
-        BaseBox(payment = uiState.payment, elevation = 2.dp) {
+        /*BaseBox(payment = uiState.payment, elevation = 2.dp) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Please, choose a bank to continue with payment",
@@ -69,6 +80,7 @@ internal fun USSDScreen(
                 BankSelector(
                     isExpanded = isExpanded,
                     selectedBank = vm.selectedBank.value,
+                    isLoading = uiState.isLoading,
                     onExpandedChanged = { isExpanded = it },
                     onDismiss = { isExpanded = false },
                     onSelected = {
@@ -76,12 +88,49 @@ internal fun USSDScreen(
                         isExpanded = false
                     }
                 )
-                USSDCodeDisplay(
-                    isLoading = uiState.isLoading,
-                    response = uiState.payment
-                )
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp, top = 32.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .fillMaxWidth()
+                        .background(color = PurpleGrey40.copy(alpha = 0.1F)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.code.isNullOrEmpty()) {
+                        Text(
+                            text = "Your USSD Payment code will appear here",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = "Dial the below code to complete payment", fontSize = 12.sp)
+                            Text(
+                                text = uiState.code ?: "",
+                                fontWeight = FontWeight.W600,
+                                fontSize = 24.sp,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            TextButton(
+                                onClick = {},
+                                colors = ButtonDefaults.textButtonColors(contentColor = Red)
+                            ) {
+                                Text(
+                                    text = "Check Transaction Status",
+                                    fontSize = 12.sp,
+                                    fontFamily = PoppinsFamily,
+                                    textDecoration = TextDecoration.Underline,
+                                )
+                            }
+                        }
+                    }
+                }
             }
-        }
+        }*/
     }
 }
 
@@ -92,7 +141,8 @@ private fun BankSelector(
     selectedBank: USSDBank?,
     onExpandedChanged: (Boolean) -> Unit,
     onDismiss: () -> Unit,
-    onSelected: (USSDBank?) -> Unit
+    onSelected: (USSDBank?) -> Unit,
+    isLoading: Boolean,
 ) {
     ExposedDropdownMenuBox(
         expanded = isExpanded,
@@ -106,7 +156,14 @@ private fun BankSelector(
             readOnly = true,
             textStyle = LocalTextStyle.current.copy(fontSize = 12.sp),
             trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 1.dp
+                    )
+                } else {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                }
             },
             placeholder = {
                 Text(
@@ -144,14 +201,7 @@ private fun USSDCodeDisplay(
     isLoading: Boolean = false,
     response: Payment? = null
 ) {
-    if (isLoading) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-        ) { CircularProgressIndicator() }
-    } else if (response != null) {
+    if (response != null) {
 
     } else {
         Box(

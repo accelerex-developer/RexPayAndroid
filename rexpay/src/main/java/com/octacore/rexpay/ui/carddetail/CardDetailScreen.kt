@@ -61,7 +61,7 @@ internal fun CardDetailScreen(
         verticalArrangement = Arrangement.Center
     ) {
         BaseTopNav(navController = navController, reference = uiState.payment?.reference)
-        BaseBox(payment = uiState.payment, elevation = 2.dp) {
+        /*BaseBox(payment = uiState.payment, elevation = 2.dp) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Please, enter your card details to make payment.",
@@ -144,7 +144,7 @@ internal fun CardDetailScreen(
                     }
                 )
             }
-        }
+        }*/
     }
 }
 

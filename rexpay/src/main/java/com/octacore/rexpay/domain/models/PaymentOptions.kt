@@ -15,7 +15,6 @@ import com.octacore.rexpay.ui.NavigationItem
  **************************************************************************************************/
 
 internal sealed class PaymentOptions(
-    internal val id: Int,
     @DrawableRes internal val icon: Int,
     internal val title: String,
     internal val route: String = "",
@@ -24,7 +23,6 @@ internal sealed class PaymentOptions(
 ) {
     internal data object CardOption :
         PaymentOptions(
-            id = 0,
             icon = R.drawable.ic_credit_card,
             title = "Pay with Card",
             route = NavigationItem.CardDetailScreen.route,
@@ -33,25 +31,22 @@ internal sealed class PaymentOptions(
         )
 
     internal data object UssdOption : PaymentOptions(
-        id = 1,
         icon = R.drawable.ic_cellphone,
         title = "Pay with USSD",
+        route = NavigationItem.USSDScreen.route,
         active = true,
-        shortName = "USSD",
-        route = NavigationItem.USSDScreen.route
+        shortName = "USSD"
     )
 
     internal data object BankOption : PaymentOptions(
-        id = 2,
         icon = R.drawable.ic_bank,
         title = "Pay with Bank",
+        route = NavigationItem.BankTransferScreen.route,
         active = true,
-        shortName = "Bank",
-        route = NavigationItem.BankTransferScreen.route
+        shortName = "Bank"
     )
 
     internal data object MobileMoneyOption : PaymentOptions(
-        id = 3,
         icon = R.drawable.ic_mobile,
         title = "Pay with Mobile Money",
         active = false,
@@ -59,7 +54,6 @@ internal sealed class PaymentOptions(
     )
 
     internal data object QRCodeOption : PaymentOptions(
-        id = 4,
         icon = R.drawable.ic_qr_code,
         title = "Pay with QR",
         active = false,

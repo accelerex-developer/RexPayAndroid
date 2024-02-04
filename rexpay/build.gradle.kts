@@ -91,9 +91,9 @@ dependencies {
     implementation(libs.retrofit.okhttp.logger)
     implementation(libs.airbnb.lottie.anim.compose)
     implementation(libs.google.gson)
-    implementation(libs.androidx.room.runtime)
+    /*implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)*/
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

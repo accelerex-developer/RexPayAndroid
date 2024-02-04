@@ -2,7 +2,6 @@
 
 package com.octacore.rexpay.domain.repo
 
-import com.octacore.rexpay.data.local.RexPayDb
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.repo.BasePaymentRepoImpl
 import com.octacore.rexpay.domain.models.BaseResult
@@ -17,7 +16,7 @@ import kotlinx.coroutines.flow.Flow
  * Date            : 27/01/2024
  **************************************************************************************************/
 internal interface BasePaymentRepo {
-    fun getTransaction(reference: String): Flow<Payment>
+//    fun getTransaction(reference: String): Flow<Payment>
 
     suspend fun initiatePayment(reference: String): BaseResult<Payment?>
 
@@ -26,9 +25,9 @@ internal interface BasePaymentRepo {
         private var INSTANCE: BasePaymentRepo? = null
 
         @JvmStatic
-        fun getInstance(service: PaymentService, database: RexPayDb): BasePaymentRepo {
+        fun getInstance(service: PaymentService): BasePaymentRepo {
             return INSTANCE ?: synchronized(this) {
-                val instance = BasePaymentRepoImpl(service, database)
+                val instance = BasePaymentRepoImpl(service)
                 INSTANCE = instance
                 instance
             }

@@ -30,10 +30,7 @@ import kotlinx.coroutines.launch
 
 internal class CardDetailViewModel(
     private val repo: CardTransactionRepo,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
-    private val reference: String = checkNotNull(savedStateHandle["reference"])
 
     private val _uiState = MutableStateFlow(CardDetailUiState())
     internal val uiState = _uiState.asStateFlow()
@@ -47,11 +44,11 @@ internal class CardDetailViewModel(
 
     init {
         job?.cancel()
-        job = viewModelScope.launch {
+        /*job = viewModelScope.launch {
             repo.getTransaction(reference).collect { payment ->
                 _uiState.update { it.copy(payment = payment) }
             }
-        }
+        }*/
     }
 
     override fun onCleared() {
@@ -61,14 +58,10 @@ internal class CardDetailViewModel(
 
     internal companion object {
         internal fun provideFactory(repo: CardTransactionRepo): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory, AbstractSavedStateViewModelFactory() {
+            object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(
-                    key: String,
-                    modelClass: Class<T>,
-                    handle: SavedStateHandle
-                ): T {
-                    return CardDetailViewModel(repo, handle) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return CardDetailViewModel(repo) as T
                 }
             }
     }

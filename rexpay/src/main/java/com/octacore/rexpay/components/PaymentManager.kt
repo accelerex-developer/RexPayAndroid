@@ -14,7 +14,7 @@ import com.octacore.rexpay.domain.models.PayResult
  * Date            : 01/02/2024
  **************************************************************************************************/
 internal interface PaymentManager {
-    fun startActivity(context: Context, payload: PayPayload)
+    fun startActivity(context: Context)
 
     fun onResponse(result: PayResult)
 
@@ -25,8 +25,6 @@ internal interface PaymentManager {
     }
 
     companion object {
-        const val PAYMENT_PAYLOAD = "payment_payload"
-
         @Volatile
         private var INSTANCE: PaymentManager? = null
 
