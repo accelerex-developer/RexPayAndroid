@@ -50,8 +50,8 @@ import com.octacore.rexpay.utils.StringUtil.formatToNaira
 @Composable
 internal fun BaseBox(
     modifier: Modifier = Modifier,
-    amount: Number = 0,
-    userInfo: String = "",
+    amount: Number? = 0,
+    userInfo: String? = null,
     elevation: Dp = 0.5.dp,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -77,7 +77,7 @@ internal fun BaseBox(
                 color = textBlack
             )
             Text(
-                text = userInfo,
+                text = userInfo ?: "",
                 fontSize = 12.sp,
                 color = textGray
             )
@@ -106,14 +106,14 @@ internal fun BaseBox(
 }
 
 @Composable
-internal fun BaseTopNav(navController: NavHostController, reference: String? = null) {
+internal fun BaseTopNav(navController: NavHostController) {
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp)
     ) {
         PaymentOptions.options.filter { it.active }
-            .map { OptionItem(it, navController, reference) }
+            .map { this.OptionItem(it, navController) }
     }
 }
 
@@ -121,7 +121,6 @@ internal fun BaseTopNav(navController: NavHostController, reference: String? = n
 private fun RowScope.OptionItem(
     option: PaymentOptions,
     navHostController: NavHostController,
-    reference: String?
 ) {
     val startId = navHostController.graph.startDestinationId
     Box(
@@ -134,7 +133,7 @@ private fun RowScope.OptionItem(
                     .setPopUpTo(startId, inclusive = false)
                     .setLaunchSingleTop(true)
                     .build()
-                navHostController.navigate(option.route + "/$reference", options)
+                navHostController.navigate(option.route, options)
             },
         contentAlignment = Alignment.Center
     ) {
@@ -151,13 +150,4 @@ private fun RowScope.OptionItem(
             )
         }
     }
-}
-
-private fun getTitle(payload: PayPayload?): String {
-    return when {
-        payload?.userId.isNullOrEmpty().not() -> payload?.userId
-        payload?.email.isNullOrEmpty().not() -> payload?.email
-        payload?.customerName.isNullOrEmpty().not() -> payload?.customerName
-        else -> ""
-    } ?: ""
 }

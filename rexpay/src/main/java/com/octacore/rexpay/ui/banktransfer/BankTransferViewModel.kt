@@ -2,22 +2,22 @@
 
 package com.octacore.rexpay.ui.banktransfer
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.octacore.rexpay.data.remote.models.ChargeBankResponse
+import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.BankAccount
 import com.octacore.rexpay.domain.models.BaseResult
 import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
-import com.octacore.rexpay.utils.LogUtils
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.coroutines.suspendCoroutine
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -34,46 +34,36 @@ internal class BankTransferViewModel(
     private val _uiState = MutableStateFlow(BankTransferState())
     internal val uiState = _uiState.asStateFlow()
 
-    private var job: Job? = null
-
-    init {
-        job?.cancel()
-        /*job = viewModelScope.launch {
-            baseRepo.getTransaction(reference).collect { payment ->
-                LogUtils.i(payment.toString())
-                _uiState.update { it.copy(payment = payment) }
-            }
-        }*/
-    }
-
     internal fun initiate() {
-        _uiState.update { BankTransferState(isLoading = true, payment = it.payment) }
+        _uiState.update { BankTransferState(isLoading = true) }
         viewModelScope.launch {
-            when (val res = repo.initiateBankTransfer()) {
-                is BaseResult.Error -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMsg = res
-                    )
-                }
-
-                is BaseResult.Success -> _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMsg = null,
-                        account = res.result
-                    )
-                }
-            }
+            val payment = async { createPayment() }.await()
+            val detail = async { chargeBank(payment) }.await()
+            _uiState.update { it.copy(account = detail) }
         }
     }
 
-    internal fun reset() = _uiState.update { BankTransferState(payment = it.payment) }
-
-    override fun onCleared() {
-        super.onCleared()
-        job?.cancel()
+    private suspend fun createPayment(): PaymentCreationResponse? {
+        return when (val res = baseRepo.initiatePayment()) {
+            is BaseResult.Error -> {
+                _uiState.update { it.copy(errorMsg = res) }
+                null
+            }
+            is BaseResult.Success -> res.result
+        }
     }
+
+    private suspend fun chargeBank(payment: PaymentCreationResponse?): ChargeBankResponse? {
+        return when (val res = repo.initiateBankTransfer(payment)) {
+            is BaseResult.Error -> {
+                _uiState.update { it.copy(errorMsg = res) }
+                null
+            }
+            is BaseResult.Success -> res.result
+        }
+    }
+
+    internal fun reset() = _uiState.update { BankTransferState() }
 
     internal companion object {
         internal fun provideFactory(
@@ -92,6 +82,5 @@ internal class BankTransferViewModel(
 internal data class BankTransferState(
     internal val isLoading: Boolean = false,
     internal val errorMsg: BaseResult.Error? = null,
-    internal val payment: Payment? = null,
-    internal val account: BankAccount? = null
+    internal val account: ChargeBankResponse? = null
 )

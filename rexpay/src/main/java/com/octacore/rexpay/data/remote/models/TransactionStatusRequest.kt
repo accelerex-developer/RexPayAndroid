@@ -10,5 +10,5 @@ package com.octacore.rexpay.data.remote.models
  * Date            : 27/01/2024
  **************************************************************************************************/
 internal data class TransactionStatusRequest(
-    internal val transactionReference: String,
+    internal val transactionReference: String?,
 )

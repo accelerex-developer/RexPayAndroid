@@ -37,7 +37,7 @@ internal fun SelectionScreen(
     navController: NavHostController,
     cache: Cache = Cache.getInstance()
 ) {
-    BaseBox(amount = cache.payload?.amount ?: 0L, userInfo = cache.payload?.userInfo ?: "") {
+    BaseBox(amount = cache.payload?.amount, userInfo = cache.payload?.userInfo) {
         Column {
             Text(
                 text = "Please select your desired payment method to continue.",

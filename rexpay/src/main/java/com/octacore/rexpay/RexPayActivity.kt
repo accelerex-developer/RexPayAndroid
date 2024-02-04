@@ -18,17 +18,14 @@ import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import com.octacore.rexpay.ui.AppNavGraph
 import com.octacore.rexpay.ui.theme.RexPayTheme
-import com.octacore.rexpay.utils.LogUtils
 
 internal class RexPayActivity : ComponentActivity() {
 

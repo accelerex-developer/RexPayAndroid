@@ -24,29 +24,13 @@ import kotlinx.coroutines.launch
  * Author          : Gideon Chukwu
  * Date            : 01/02/2024
  **************************************************************************************************/
-internal class BankDetailViewModel(
-    private val repo: BankTransactionRepo,
-    handle: SavedStateHandle
-) : ViewModel() {
-
-    private val reference: String = checkNotNull(handle["reference"])
+internal class BankDetailViewModel(private val repo: BankTransactionRepo) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BankDetailUiState())
     internal val uiState = _uiState.asStateFlow()
 
-    private var job: Job? = null
-
-    init {
-        job?.cancel()
-        /*job = viewModelScope.launch {
-            repo.getAccount(reference).collect { account ->
-                _uiState.update { it.copy(account = account) }
-            }
-        }*/
-    }
-
-    fun confirmTransaction() {
-        _uiState.update { BankDetailUiState(isLoading = true, account = it.account) }
+    internal fun confirmTransaction(reference: String?) {
+        _uiState.update { BankDetailUiState(isLoading = true) }
         viewModelScope.launch {
             when (val res = repo.checkTransactionStatus(reference)) {
                 is BaseResult.Error -> _uiState.update {
@@ -67,23 +51,14 @@ internal class BankDetailViewModel(
         }
     }
 
-    fun reset() = _uiState.update { BankDetailUiState(account = it.account) }
-
-    override fun onCleared() {
-        super.onCleared()
-        job?.cancel()
-    }
+    fun reset() = _uiState.update { BankDetailUiState() }
 
     internal companion object {
         internal fun provideFactory(repo: BankTransactionRepo): ViewModelProvider.Factory =
-            object : ViewModelProvider.Factory, AbstractSavedStateViewModelFactory() {
+            object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(
-                    key: String,
-                    modelClass: Class<T>,
-                    handle: SavedStateHandle
-                ): T {
-                    return BankDetailViewModel(repo, handle) as T
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return BankDetailViewModel(repo) as T
                 }
             }
     }
@@ -92,6 +67,5 @@ internal class BankDetailViewModel(
 internal data class BankDetailUiState(
     internal val isLoading: Boolean = false,
     internal val errorMsg: BaseResult.Error? = null,
-    internal val account: BankAccount? = null,
     internal val response: TransactionStatusResponse? = null
 )

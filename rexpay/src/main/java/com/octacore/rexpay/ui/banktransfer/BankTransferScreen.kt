@@ -31,6 +31,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
 import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
@@ -52,6 +53,7 @@ internal fun BankTransferScreen(
     vm: BankTransferViewModel = viewModel(),
     manager: PaymentManager = PaymentManager.getInstance()
 ) {
+    val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 
     if (uiState.errorMsg != null) {
@@ -61,25 +63,31 @@ internal fun BankTransferScreen(
                 manager.onResponse(err)
                 vm.reset()
             },
-            onContinue = {  },
+            onContinue = { },
             message = uiState.errorMsg?.message ?: "Something went wrong"
         )
     }
 
     if (uiState.account != null) {
+        val startId = navController.graph.startDestinationId
         val options = NavOptions.Builder()
             .setLaunchSingleTop(true)
+            .setPopUpTo(startId, inclusive = false)
             .build()
         navController.navigate(
-            NavigationItem.BankDetailScreen.route + "/${uiState.payment?.reference}",
+            NavigationItem.BankDetailScreen.route,
             options
         )
         vm.reset()
     }
 
     Column(verticalArrangement = Arrangement.Center) {
-        BaseTopNav(navController = navController, reference = uiState.payment?.reference)
-        /*BaseBox(payment = uiState.payment, elevation = 2.dp) {
+        BaseTopNav(navController = navController)
+        BaseBox(
+            amount = cache.payload?.amount,
+            userInfo = cache.payload?.userInfo,
+            elevation = 2.dp
+        ) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Kindly click the button to get account details",
@@ -95,7 +103,7 @@ internal fun BankTransferScreen(
                         contentColor = Color.White
                     ),
                     enabled = !uiState.isLoading,
-                    contentPadding = PaddingValues(vertical = 16.dp),
+                    contentPadding = PaddingValues(vertical = 12.dp),
                     content = {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(
@@ -108,7 +116,7 @@ internal fun BankTransferScreen(
                     }
                 )
             }
-        }*/
+        }
     }
 }
 
@@ -138,7 +146,7 @@ private fun ErrorDialog(
         )
         LottieAnimation(
             composition,
-            progress,
+            { progress },
             modifier = Modifier.size(120.dp)
         )
         Text(

@@ -2,8 +2,11 @@
 
 package com.octacore.rexpay.data.repo
 
+import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.ChargeBankRequest
+import com.octacore.rexpay.data.remote.models.ChargeBankResponse
+import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.TransactionStatusRequest
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.domain.models.BankAccount
@@ -20,45 +23,21 @@ import kotlinx.coroutines.withContext
  * Author          : Gideon Chukwu
  * Date            : 31/01/2024
  **************************************************************************************************/
-internal class BankTransactionRepoImpl(
-    private val service: PaymentService
-) : BankTransactionRepo, BaseRepo() {
+internal class BankTransactionRepoImpl(private val service: PaymentService) : BankTransactionRepo, BaseRepo() {
 
-    /*override fun getAccount(reference: String): Flow<BankAccount> {
-        return paymentDao.fetchPaymentAccountByRefAsync(reference).distinctUntilChanged()
-            .map {
-                val payment = Payment(it.payment)
-                BankAccount(it.account).apply {
-                    this.payment = payment
-                }
-            }
-    }*/
+    private val cache = Cache.getInstance()
 
-    override suspend fun initiateBankTransfer(): BaseResult<BankAccount?> {
-        val payload = withContext(Dispatchers.IO) {
-            val data = try {
-//                paymentDao.fetchPaymentByRef(reference)
-            } catch (e: Exception) {
-                LogUtils.e("DatabaseError: ${e.message}", e)
-                null
-            }
-            return@withContext data
+    override suspend fun initiateBankTransfer(payment: PaymentCreationResponse?): BaseResult<ChargeBankResponse?> {
+        val request = ChargeBankRequest(cache.payload, payment)
+        val res = processRequest { service.chargeBank(request) }
+        if (res is BaseResult.Success) {
+            val account = BankAccount(res.result)
+            cache.bankAccount = account
         }
-//        val request = ChargeBankRequest(payload)
-        return when (val res = processRequest { service.chargeBank(null) }) {
-            is BaseResult.Error -> BaseResult.Error(res.message)
-            is BaseResult.Success -> {
-                /*val data = withContext(Dispatchers.IO) {
-                    val data = res.result?.let { AccountEntity(it) }
-                    data?.let { paymentDao.insertAccount(it) }
-                    return@withContext BankAccount(data)
-                }*/
-                BaseResult.Success(null)
-            }
-        }
+        return res
     }
 
-    override suspend fun checkTransactionStatus(reference: String): BaseResult<TransactionStatusResponse?> {
+    override suspend fun checkTransactionStatus(reference: String?): BaseResult<TransactionStatusResponse?> {
         val request = TransactionStatusRequest(reference)
         return processRequest { service.fetchTransactionStatus(request) }
     }

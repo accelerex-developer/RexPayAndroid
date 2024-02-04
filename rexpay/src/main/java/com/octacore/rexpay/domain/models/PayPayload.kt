@@ -139,27 +139,27 @@ class PayPayload private constructor() {
     }
 
     class Builder {
-        private val payload = PayPayload()
+        private var payload = PayPayload()
 
         @Throws(NullPointerException::class)
         fun reference(value: String?) = apply {
             if (value.isNullOrEmpty()) throw NullPointerException("Reference cannot be null or empty")
-            payload.copy(reference = value)
+            payload = payload.copy(reference = value)
         }
 
         @Throws(NullPointerException::class, IllegalArgumentException::class)
         fun amount(value: Long?) = apply {
             if (value == null) throw NullPointerException("Amount cannot be null")
             if (value <= 0) throw IllegalArgumentException("Amount entered is not valid")
-            payload.copy(amount = value)
+            payload = payload.copy(amount = value)
         }
 
-        fun currency(value: String?) = apply { payload.copy(currency = value) }
+        fun currency(value: String?) = apply { payload = payload.copy(currency = value) }
 
         @Throws(NullPointerException::class)
         fun userId(value: String?) = apply {
             if (value.isNullOrEmpty()) throw NullPointerException("UserId cannot be null or empty")
-            payload.copy(userId = value)
+            payload = payload.copy(userId = value)
         }
 
         fun callbackUrl(value: String?) = apply { payload.copy(callbackUrl = value) }
@@ -167,13 +167,13 @@ class PayPayload private constructor() {
         @Throws(NullPointerException::class)
         fun email(value: String?) = apply {
             if (value.isNullOrEmpty()) throw NullPointerException("Email cannot be null or empty")
-            payload.copy(email = value)
+            payload = payload.copy(email = value)
         }
 
         @Throws(NullPointerException::class)
         fun customerName(value: String?) = apply {
             if (value.isNullOrEmpty()) throw NullPointerException("Customer name cannot be null or empty")
-            payload.copy(customerName = value)
+            payload = payload.copy(customerName = value)
         }
 
         fun build(): PayPayload = payload

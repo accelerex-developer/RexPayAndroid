@@ -4,14 +4,12 @@ package com.octacore.rexpay
 
 import android.app.Application
 import android.content.Context
-import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.domain.models.ConfigProp
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
-import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -21,23 +19,34 @@ import com.octacore.rexpay.utils.LogUtils
  * Date            : 31/01/2024
  **************************************************************************************************/
 internal object RexPayApp {
-    private lateinit var context: Application
 
-    private lateinit var config: ConfigProp
+    private var _baseRepo: BasePaymentRepo? = null
+
+    private var _ussdRepo: USSDTransactionRepo? = null
+
+    private var _cardRepo: CardTransactionRepo? = null
+
+    private var _bankRepo: BankTransactionRepo? = null
 
     @JvmStatic
-    fun init(context: Context, config: ConfigProp) {
-        this.context = context.applicationContext as Application
-        this.config = config
+    internal fun init(context: Context, config: ConfigProp) {
+        val app = context.applicationContext as Application
+        val service = PaymentService.getInstance(app, config)
+        _baseRepo = BasePaymentRepo.getInstance(service)
+        _ussdRepo = USSDTransactionRepo.getInstance(service)
+        _cardRepo = CardTransactionRepo.getInstance(service)
+        _bankRepo = BankTransactionRepo.getInstance(service)
     }
 
-    private val service by lazy { PaymentService.getInstance(context, config) }
+    internal val basePaymentRepo: BasePaymentRepo
+        get() = _baseRepo!!
 
-    val basePaymentRepo by lazy { BasePaymentRepo.getInstance(service) }
+    internal val ussdRepo: USSDTransactionRepo
+        get() = _ussdRepo!!
 
-    val ussdRepo by lazy { USSDTransactionRepo.getInstance(service) }
+    internal val cardRepo: CardTransactionRepo
+        get() = _cardRepo!!
 
-    val cardRepo by lazy { CardTransactionRepo.getInstance(service) }
-
-    val bankRepo by lazy { BankTransactionRepo.getInstance(service) }
+    internal val bankRepo: BankTransactionRepo
+        get() = _bankRepo!!
 }

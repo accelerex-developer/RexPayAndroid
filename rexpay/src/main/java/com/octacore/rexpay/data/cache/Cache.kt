@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.data.cache
 
+import com.octacore.rexpay.domain.models.BankAccount
 import com.octacore.rexpay.domain.models.PayPayload
 
 /***************************************************************************************************
@@ -19,13 +20,7 @@ internal interface Cache {
 
     var ussdCode: String?
 
-    /*fun setPayload(value: PayPayload?)
-
-    fun setUssdCode(value: String?)
-
-    fun getPayload(): PayPayload?
-
-    fun getUssdCode(): String?*/
+    var bankAccount: BankAccount?
 
     companion object {
         @Volatile

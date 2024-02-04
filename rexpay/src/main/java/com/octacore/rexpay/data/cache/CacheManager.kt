@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.data.cache
 
+import com.octacore.rexpay.domain.models.BankAccount
 import com.octacore.rexpay.domain.models.PayPayload
 
 /***************************************************************************************************
@@ -15,6 +16,8 @@ internal class CacheManager : Cache {
 
     private var _payload: PayPayload? = null
     private var _ussdCode: String? = null
+    private var _bankAccount: BankAccount? = null
+
     override var payload: PayPayload?
         get() = _payload
         set(value) {
@@ -24,5 +27,11 @@ internal class CacheManager : Cache {
         get() = _ussdCode
         set(value) {
             _ussdCode = value
+        }
+
+    override var bankAccount: BankAccount?
+        get() = _bankAccount
+        set(value) {
+            _bankAccount = value
         }
 }

@@ -68,7 +68,7 @@ internal fun USSDScreen(
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.Center) {
-        BaseTopNav(navController = navController, reference = uiState.payment?.reference)
+        BaseTopNav(navController = navController)
         /*BaseBox(payment = uiState.payment, elevation = 2.dp) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(

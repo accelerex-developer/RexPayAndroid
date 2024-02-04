@@ -2,13 +2,26 @@
 
 package com.octacore.rexpay.ui.bankdetail
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,9 +36,14 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
 import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.domain.models.PayResult
+import com.octacore.rexpay.ui.BaseBox
+import com.octacore.rexpay.ui.BaseTopNav
 import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.NavigationItem
+import com.octacore.rexpay.ui.theme.PurpleGrey40
+import com.octacore.rexpay.ui.theme.Red
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -40,6 +58,7 @@ internal fun BankDetailScreen(
     manager: PaymentManager = PaymentManager.getInstance(),
     vm: BankDetailViewModel = viewModel(),
 ) {
+    val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     if (uiState.response != null) {
         if (uiState.response?.responseCode == "02") {
@@ -53,7 +72,6 @@ internal fun BankDetailScreen(
                 .setPopUpTo(startId, inclusive = false)
                 .setLaunchSingleTop(true)
                 .build()
-//            val amount = uiState.account?.payment?.amount
             navController.navigate(NavigationItem.SuccessScreen.route, option)
             vm.reset()
         }
@@ -70,11 +88,14 @@ internal fun BankDetailScreen(
         )
     }
 
-    /*val account = uiState.account
-    val payment = account?.payment
+    val account = cache.bankAccount
     Column(verticalArrangement = Arrangement.Center) {
-        BaseTopNav(navController = navController, reference = payment?.reference)
-        BaseBox(payment = payment, elevation = 2.dp) {
+        BaseTopNav(navController = navController)
+        BaseBox(
+            amount = cache.payload?.amount,
+            userInfo = cache.payload?.userInfo,
+            elevation = 2.dp
+        ) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Kindly proceed to your banking app mobile/internet to complete your bank transfer.",
@@ -121,13 +142,13 @@ internal fun BankDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 24.dp),
-                    onClick = { vm.confirmTransaction() },
+                    onClick = { vm.confirmTransaction(account?.reference) },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Red,
                         contentColor = Color.White
                     ),
                     enabled = !uiState.isLoading,
-                    contentPadding = PaddingValues(vertical = 16.dp),
+                    contentPadding = PaddingValues(vertical = 12.dp),
                     content = {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(
@@ -141,7 +162,7 @@ internal fun BankDetailScreen(
                 )
             }
         }
-    }*/
+    }
 }
 
 @Composable
@@ -168,7 +189,7 @@ private fun PendingDialog(
         )
         LottieAnimation(
             composition,
-            progress,
+            { progress },
             modifier = Modifier.size(120.dp)
         )
         Text(
@@ -206,7 +227,7 @@ private fun ErrorDialog(
         )
         LottieAnimation(
             composition,
-            progress,
+            { progress },
             modifier = Modifier.size(120.dp)
         )
         Text(

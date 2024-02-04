@@ -2,8 +2,10 @@
 
 package com.octacore.rexpay.data.repo
 
+import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.PaymentCreationRequest
+import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.BaseResult
 import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
@@ -20,35 +22,10 @@ import kotlinx.coroutines.withContext
  **************************************************************************************************/
 internal class BasePaymentRepoImpl(private val service: PaymentService) : BasePaymentRepo, BaseRepo() {
 
-//    private val paymentDao by lazy { database.paymentDao() }
-    /*override fun getTransaction(reference: String): Flow<Payment> {
-        return paymentDao.fetchPaymentByRefAsync(reference)
-            .distinctUntilChanged()
-            .map { Payment(it) }
-    }*/
+    private val cache by lazy { Cache.getInstance() }
 
-    override suspend fun initiatePayment(reference: String): BaseResult<Payment?> {
-        val payload = withContext(Dispatchers.IO) {
-            val data = try {
-//                paymentDao.fetchPaymentByRef(reference)
-            } catch (e: Exception) {
-                LogUtils.e("DatabaseError: ${e.message}", e)
-                null
-            }
-            return@withContext data
-        }
-//        val request = PaymentCreationRequest(payload)
-        return when (val res = processRequest { service.createPayment(null) }) {
-            is BaseResult.Success -> {
-                /*val data = withContext(Dispatchers.IO) {
-                    val data = res.result?.let { PaymentEntity(payload, it) }
-                    data?.let { paymentDao.updatePayment(it) }
-                    return@withContext data
-                }*/
-                BaseResult.Success(null)
-            }
-
-            is BaseResult.Error -> BaseResult.Error(res.message)
-        }
+    override suspend fun initiatePayment(): BaseResult<PaymentCreationResponse?> {
+        val request = PaymentCreationRequest(cache.payload)
+        return processRequest { service.createPayment(request) }
     }
 }

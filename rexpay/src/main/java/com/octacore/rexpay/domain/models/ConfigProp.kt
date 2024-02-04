@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.domain.models
 
+import com.octacore.rexpay.utils.LogUtils
 import java.io.File
 
 /***************************************************************************************************
@@ -52,24 +53,10 @@ class ConfigProp private constructor() {
 
     override fun toString(): String {
         return "ConfigProp(" +
-                "username='$_username', " +
-                "passphrase='$_passphrase', " +
-                "publicKey=$_publicKey, " +
-                "privateKey=$_privateKey, " +
-                "baseUrl='$_baseUrl'" +
+                "username='$username', " +
+                "passphrase='$passphrase', " +
+                "baseUrl='$baseUrl'" +
                 ")"
-    }
-
-    override fun hashCode(): Int {
-        var result = _username.hashCode()
-        result = 31 * result + _passphrase.hashCode()
-        result = 31 * result + (_publicKey?.hashCode() ?: 0)
-        result = 31 * result + (_privateKey?.hashCode() ?: 0)
-        result = 31 * result + _baseUrl.hashCode()
-        result = 31 * result + username.hashCode()
-        result = 31 * result + passphrase.hashCode()
-        result = 31 * result + baseUrl.hashCode()
-        return result
     }
 
     override fun equals(other: Any?): Boolean {
@@ -81,29 +68,40 @@ class ConfigProp private constructor() {
         if (_username != other._username) return false
         if (_passphrase != other._passphrase) return false
         if (_publicKey != other._publicKey) return false
-        return _privateKey == other._privateKey
+        if (_privateKey != other._privateKey) return false
+        return _baseUrl == other._baseUrl
     }
 
+    override fun hashCode(): Int {
+        var result = _username.hashCode()
+        result = 31 * result + _passphrase.hashCode()
+        result = 31 * result + (_publicKey?.hashCode() ?: 0)
+        result = 31 * result + (_privateKey?.hashCode() ?: 0)
+        result = 31 * result + _baseUrl.hashCode()
+        return result
+    }
+
+
     class Builder {
-        private val config: ConfigProp = ConfigProp()
+        private var config: ConfigProp = ConfigProp()
 
-        fun username(value: String) = apply { config.copy(username = value) }
+        fun username(value: String) = apply { config = config.copy(username = value) }
 
-        fun passphrase(value: String) = apply { config.copy(passphrase = value) }
+        fun passphrase(value: String) = apply { config = config.copy(passphrase = value) }
 
-        fun baseUrl(value: String) = apply { config.copy(baseUrl = value) }
-
-        fun publicKey(value: String) = apply { }
-
-        fun publicKey(value: File?) = apply { }
-
-        fun privateKey(value: String) = apply { }
-
-        fun privateKey(value: File?) = apply { }
-
-        fun build(): ConfigProp {
-            return config
+        fun baseUrl(value: String) = apply {
+            config = config.copy(baseUrl = value)
         }
+
+        fun publicKey(value: String) = apply { config = config.copy() }
+
+        fun publicKey(value: File?) = apply { config = config.copy() }
+
+        fun privateKey(value: String) = apply { config = config.copy() }
+
+        fun privateKey(value: File?) = apply { config = config.copy() }
+
+        fun build(): ConfigProp = config
     }
 
 }

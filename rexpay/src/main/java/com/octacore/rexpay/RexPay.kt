@@ -29,8 +29,8 @@ interface RexPay {
             configProp: ConfigProp,
             showLog: Boolean = BuildConfig.DEBUG
         ) {
-            RexPayApp.init(context, configProp)
             LogUtils.init(showLog = showLog)
+            RexPayApp.init(context, configProp)
         }
 
         fun getInstance(): RexPay {
