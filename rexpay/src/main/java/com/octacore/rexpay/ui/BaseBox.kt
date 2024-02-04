@@ -31,12 +31,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import com.octacore.rexpay.R
-import com.octacore.rexpay.domain.models.PayPayload
-import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
-import com.octacore.rexpay.utils.LogUtils
 import com.octacore.rexpay.utils.StringUtil.formatToNaira
 
 /***************************************************************************************************

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.octacore.rexpay.RexPayApp
+import com.octacore.rexpay.components.RexPayApp
 import com.octacore.rexpay.ui.bankdetail.BankDetailScreen
 import com.octacore.rexpay.ui.bankdetail.BankDetailViewModel
 import com.octacore.rexpay.ui.banktransfer.BankTransferScreen

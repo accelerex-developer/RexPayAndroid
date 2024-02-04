@@ -7,9 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.data.remote.models.ChargeBankResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
-import com.octacore.rexpay.domain.models.BankAccount
-import com.octacore.rexpay.domain.models.BaseResult
-import com.octacore.rexpay.domain.models.Payment
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import kotlinx.coroutines.async
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.coroutines.suspendCoroutine
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

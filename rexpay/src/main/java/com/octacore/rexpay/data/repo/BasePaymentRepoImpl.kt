@@ -6,12 +6,8 @@ import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.PaymentCreationRequest
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
-import com.octacore.rexpay.domain.models.BaseResult
-import com.octacore.rexpay.domain.models.Payment
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
-import com.octacore.rexpay.utils.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

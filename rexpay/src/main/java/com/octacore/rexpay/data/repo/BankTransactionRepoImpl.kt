@@ -10,11 +10,8 @@ import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.TransactionStatusRequest
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.domain.models.BankAccount
-import com.octacore.rexpay.domain.models.BaseResult
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
-import com.octacore.rexpay.utils.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

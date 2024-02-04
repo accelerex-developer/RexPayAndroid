@@ -2,16 +2,12 @@
 
 package com.octacore.rexpay.ui.bankdetail
 
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
-import com.octacore.rexpay.domain.models.BankAccount
-import com.octacore.rexpay.domain.models.BaseResult
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

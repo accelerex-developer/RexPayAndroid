@@ -1,6 +1,6 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay.domain.models
+package com.octacore.rexpay.data
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

@@ -5,20 +5,14 @@ package com.octacore.rexpay.ui.carddetail
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.octacore.rexpay.domain.models.Payment
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.utils.CreditCardFormatter
 import com.octacore.rexpay.utils.ExpiryDateFormatter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -70,5 +64,4 @@ internal class CardDetailViewModel(
 internal data class CardDetailUiState(
     val isLoading: Boolean = false,
     val errorMsg: String? = null,
-    val payment: Payment? = null,
 )

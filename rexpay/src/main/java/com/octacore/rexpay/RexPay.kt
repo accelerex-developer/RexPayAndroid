@@ -1,6 +1,7 @@
 package com.octacore.rexpay
 
 import android.content.Context
+import com.octacore.rexpay.components.RexPayApp
 import com.octacore.rexpay.data.RexPayImpl
 import com.octacore.rexpay.domain.models.ConfigProp
 import com.octacore.rexpay.domain.models.PayPayload

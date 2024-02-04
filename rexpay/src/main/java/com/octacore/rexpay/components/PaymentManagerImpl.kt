@@ -3,7 +3,6 @@ package com.octacore.rexpay.components
 import android.content.Context
 import android.content.Intent
 import com.octacore.rexpay.domain.models.PayResult
-import com.octacore.rexpay.RexPayActivity
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

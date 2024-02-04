@@ -1,6 +1,6 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay
+package com.octacore.rexpay.components
 
 import android.app.Application
 import android.content.Context

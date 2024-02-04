@@ -1,6 +1,6 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay
+package com.octacore.rexpay.components
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.octacore.rexpay.R
 import com.octacore.rexpay.ui.AppNavGraph
 import com.octacore.rexpay.ui.theme.RexPayTheme
 

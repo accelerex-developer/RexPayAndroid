@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
@@ -39,7 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.octacore.rexpay.domain.models.Payment
+import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
@@ -64,12 +63,17 @@ internal fun USSDScreen(
     navController: NavHostController,
     vm: USSDViewModel = viewModel(),
 ) {
+    val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.Center) {
         BaseTopNav(navController = navController)
-        /*BaseBox(payment = uiState.payment, elevation = 2.dp) {
+        BaseBox(
+            amount = cache.payload?.amount,
+            userInfo = cache.payload?.userInfo,
+            elevation = 2.dp
+        ) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Please, choose a bank to continue with payment",
@@ -96,7 +100,7 @@ internal fun USSDScreen(
                         .background(color = PurpleGrey40.copy(alpha = 0.1F)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (uiState.code.isNullOrEmpty()) {
+                    if (uiState.response == null) {
                         Text(
                             text = "Your USSD Payment code will appear here",
                             fontSize = 12.sp,
@@ -110,13 +114,13 @@ internal fun USSDScreen(
                         ) {
                             Text(text = "Dial the below code to complete payment", fontSize = 12.sp)
                             Text(
-                                text = uiState.code ?: "",
+                                text = uiState.response?.providerResponse ?: "",
                                 fontWeight = FontWeight.W600,
                                 fontSize = 24.sp,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                             TextButton(
-                                onClick = {},
+                                onClick = { vm.checkTransactionStatus(uiState.response?.reference) },
                                 colors = ButtonDefaults.textButtonColors(contentColor = Red)
                             ) {
                                 Text(
@@ -130,7 +134,7 @@ internal fun USSDScreen(
                     }
                 }
             }
-        }*/
+        }
     }
 }
 
@@ -192,30 +196,6 @@ private fun BankSelector(
                     content = { Text(text = bank.display) },
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun USSDCodeDisplay(
-    isLoading: Boolean = false,
-    response: Payment? = null
-) {
-    if (response != null) {
-
-    } else {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(vertical = 48.dp)
-        ) {
-            Text(
-                text = "Your USSD Payment code will appear here",
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }

@@ -7,8 +7,7 @@ import com.octacore.rexpay.data.remote.models.ChargeBankResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.data.repo.BankTransactionRepoImpl
-import com.octacore.rexpay.domain.models.BankAccount
-import com.octacore.rexpay.domain.models.BaseResult
+import com.octacore.rexpay.data.BaseResult
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

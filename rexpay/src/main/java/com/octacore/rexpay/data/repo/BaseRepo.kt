@@ -6,8 +6,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.octacore.rexpay.data.remote.models.ErrorResponse
-import com.octacore.rexpay.domain.models.BaseResult
-import com.octacore.rexpay.domain.models.BaseResult.Error
+import com.octacore.rexpay.data.BaseResult
+import com.octacore.rexpay.data.BaseResult.Error
 import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

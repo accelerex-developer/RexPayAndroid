@@ -23,6 +23,7 @@ internal class CacheManager : Cache {
         set(value) {
             _payload = value
         }
+
     override var ussdCode: String?
         get() = _ussdCode
         set(value) {

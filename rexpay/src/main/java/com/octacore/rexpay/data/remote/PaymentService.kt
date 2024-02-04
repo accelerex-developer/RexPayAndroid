@@ -57,12 +57,12 @@ internal interface PaymentService {
     suspend fun fetchTransactionStatus(@Body request: TransactionStatusRequest): Response<TransactionStatusResponse?>
 
     @POST("pgs/payment/v1/makePayment")
-    suspend fun chargeUssd(@Body request: ChargeUssdRequest?): Response<ChargeUssdResponse?>
+    suspend fun chargeUssd(@Body request: ChargeUssdRequest): Response<ChargeUssdResponse?>
 
-    @GET("pgs/payment/v1/getPaymentDetails/{clientId}/{trans}")
+    @GET("pgs/payment/v1/getPaymentDetails/{trans}")
     suspend fun fetchUssdPaymentDetail(
         @Path("trans") reference: String,
-        @Path("clientId") clientId: String
+//        @Path("clientId") clientId: String
     ): Response<UssdPaymentDetailResponse?>
 
     @POST("pgs/clients/v1/publicKey")

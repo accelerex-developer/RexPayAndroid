@@ -5,9 +5,7 @@ package com.octacore.rexpay.domain.repo
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.repo.BasePaymentRepoImpl
-import com.octacore.rexpay.domain.models.BaseResult
-import com.octacore.rexpay.domain.models.Payment
-import kotlinx.coroutines.flow.Flow
+import com.octacore.rexpay.data.BaseResult
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
