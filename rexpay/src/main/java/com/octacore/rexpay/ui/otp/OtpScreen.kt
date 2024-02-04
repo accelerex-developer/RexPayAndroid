@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
 

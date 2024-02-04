@@ -18,11 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import com.octacore.rexpay.components.PaymentManager
 import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.domain.models.PaymentOptions
 import com.octacore.rexpay.ui.theme.textBlack
-import com.octacore.rexpay.utils.LogUtils
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

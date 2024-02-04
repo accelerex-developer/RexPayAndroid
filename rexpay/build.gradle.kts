@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.android.kotlin)
     alias(libs.plugins.android.kotlin.ksp)
-    id(libs.plugins.android.kotlin.parcelize.get().pluginId)
 }
 
 fun getCredProps(): Properties {

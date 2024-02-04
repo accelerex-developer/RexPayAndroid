@@ -8,13 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.data.BaseResult
-import com.octacore.rexpay.data.remote.models.ChargeBankResponse
 import com.octacore.rexpay.data.remote.models.ChargeUssdResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

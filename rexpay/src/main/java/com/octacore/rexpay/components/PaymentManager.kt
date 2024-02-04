@@ -3,7 +3,6 @@
 package com.octacore.rexpay.components
 
 import android.content.Context
-import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.domain.models.PayResult
 
 /***************************************************************************************************

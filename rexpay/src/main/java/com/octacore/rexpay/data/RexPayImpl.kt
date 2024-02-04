@@ -8,7 +8,6 @@ import com.octacore.rexpay.components.PaymentManager
 import com.octacore.rexpay.data.cache.Cache
 import com.octacore.rexpay.domain.models.PayPayload
 import com.octacore.rexpay.domain.models.PayResult
-import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

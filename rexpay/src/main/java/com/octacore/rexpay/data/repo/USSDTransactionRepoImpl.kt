@@ -2,18 +2,15 @@
 
 package com.octacore.rexpay.data.repo
 
-import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.cache.Cache
+import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.ChargeUssdRequest
 import com.octacore.rexpay.data.remote.models.ChargeUssdResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.UssdPaymentDetailResponse
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
-import com.octacore.rexpay.utils.LogUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.

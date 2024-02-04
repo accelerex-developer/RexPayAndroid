@@ -2,7 +2,6 @@
 
 package com.octacore.rexpay.domain.models
 
-import com.octacore.rexpay.utils.LogUtils
 import java.io.File
 
 /***************************************************************************************************

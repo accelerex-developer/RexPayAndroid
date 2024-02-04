@@ -73,7 +73,7 @@ internal fun SuccessScreen(
             )
             LottieAnimation(
                 composition,
-                progress,
+                { progress },
                 modifier = Modifier.size(120.dp)
             )
             val annotatedString = buildAnnotatedString {
