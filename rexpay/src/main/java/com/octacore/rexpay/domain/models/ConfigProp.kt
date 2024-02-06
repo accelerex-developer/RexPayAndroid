@@ -2,6 +2,8 @@
 
 package com.octacore.rexpay.domain.models
 
+import android.content.Context
+import com.octacore.rexpay.utils.InputOutputUtils
 import java.io.File
 
 /***************************************************************************************************
@@ -15,7 +17,7 @@ class ConfigProp private constructor() {
 
     private var _username: String = ""
 
-    private var _passphrase: String = ""
+    private var _password: String = ""
 
     private var _publicKey: File? = null
 
@@ -23,37 +25,77 @@ class ConfigProp private constructor() {
 
     private var _baseUrl: String = "https://pgs-sandbox.globalaccelerex.com/api/"
 
-    constructor(username: String?, passphrase: String?, baseUrl: String?) : this() {
+    constructor(
+        username: String?,
+        password: String?,
+        baseUrl: String?,
+        publicKey: File?,
+        privateKey: File?
+    ) : this() {
         if (username == null) throw NullPointerException("Username cannot be missing")
         this._username = username
 
-        if (passphrase == null) throw NullPointerException("Passphrase cannot be missing")
-        this._passphrase = passphrase
+        if (password == null) throw NullPointerException("Passphrase cannot be missing")
+        this._password = password
 
         this._baseUrl = baseUrl ?: _baseUrl
+
+        this._publicKey = publicKey
+
+        this._privateKey = privateKey
     }
 
-    val username: String
+    constructor(
+        context: Context,
+        username: String?,
+        password: String?,
+        baseUrl: String?,
+        publicKey: String?,
+        privateKey: String?
+    ) : this() {
+        InputOutputUtils.clearCache(context)
+        if (username == null) throw NullPointerException("Username cannot be missing")
+        this._username = username
+
+        if (password == null) throw NullPointerException("Passphrase cannot be missing")
+        this._password = password
+
+        this._baseUrl = baseUrl ?: _baseUrl
+
+        this._publicKey = InputOutputUtils.generateTempFile("pub", publicKey, context)
+
+        this._privateKey = InputOutputUtils.generateTempFile("sec", privateKey, context)
+    }
+
+    internal val username: String
         get() = _username
 
-    val passphrase: String
-        get() = _passphrase
+    internal val password: String
+        get() = _password
 
-    val baseUrl: String
+    internal val baseUrl: String
         get() = _baseUrl
+
+    internal val publicKey: File
+        get() = _publicKey!!
+
+    internal val privateKey: File
+        get() = _privateKey!!
 
     internal fun copy(
         username: String = this._username,
-        passphrase: String = this._passphrase,
-        baseUrl: String = this._baseUrl
+        password: String = this._password,
+        baseUrl: String = this._baseUrl,
+        publicKey: File? = this._publicKey,
+        privateKey: File? = this._privateKey,
     ): ConfigProp {
-        return ConfigProp(username, passphrase, baseUrl)
+        return ConfigProp(username, password, baseUrl, publicKey, privateKey)
     }
 
     override fun toString(): String {
         return "ConfigProp(" +
                 "username='$username', " +
-                "passphrase='$passphrase', " +
+                "passphrase='$password', " +
                 "baseUrl='$baseUrl'" +
                 ")"
     }
@@ -65,7 +107,7 @@ class ConfigProp private constructor() {
         other as ConfigProp
 
         if (_username != other._username) return false
-        if (_passphrase != other._passphrase) return false
+        if (_password != other._password) return false
         if (_publicKey != other._publicKey) return false
         if (_privateKey != other._privateKey) return false
         return _baseUrl == other._baseUrl
@@ -73,7 +115,7 @@ class ConfigProp private constructor() {
 
     override fun hashCode(): Int {
         var result = _username.hashCode()
-        result = 31 * result + _passphrase.hashCode()
+        result = 31 * result + _password.hashCode()
         result = 31 * result + (_publicKey?.hashCode() ?: 0)
         result = 31 * result + (_privateKey?.hashCode() ?: 0)
         result = 31 * result + _baseUrl.hashCode()
@@ -81,26 +123,35 @@ class ConfigProp private constructor() {
     }
 
 
-    class Builder {
+    class Builder(private val context: Context) {
         private var config: ConfigProp = ConfigProp()
+
+        init {
+            InputOutputUtils.clearCache(context)
+        }
 
         fun username(value: String) = apply { config = config.copy(username = value) }
 
-        fun passphrase(value: String) = apply { config = config.copy(passphrase = value) }
+        fun password(value: String) = apply { config = config.copy(password = value) }
 
         fun baseUrl(value: String) = apply {
             config = config.copy(baseUrl = value)
         }
 
-        fun publicKey(value: String) = apply { config = config.copy() }
+        fun publicKey(value: String) = apply {
+            val file = InputOutputUtils.generateTempFile("pub", value, context)
+            config = config.copy(publicKey = file)
+        }
 
-        fun publicKey(value: File?) = apply { config = config.copy() }
+        fun publicKey(value: File?) = apply { config = config.copy(publicKey = value) }
 
-        fun privateKey(value: String) = apply { config = config.copy() }
+        fun privateKey(value: String) = apply {
+            val file = InputOutputUtils.generateTempFile("sec", value, context)
+            config = config.copy(privateKey = file)
+        }
 
-        fun privateKey(value: File?) = apply { config = config.copy() }
+        fun privateKey(value: File?) = apply { config = config.copy(privateKey = value) }
 
         fun build(): ConfigProp = config
     }
-
 }

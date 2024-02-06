@@ -1,14 +1,17 @@
 @file:JvmSynthetic
 
-package com.octacore.rexpay.data.remote.models
+package com.octacore.rexpay.domain.models
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
  ***************************************************************************************************
  * Project         : rexpay
  * Author          : Gideon Chukwu
- * Date            : 27/01/2024
+ * Date            : 05/02/2024
  **************************************************************************************************/
-internal data class EncryptedRequest(
-    internal val encryptedRequest: String?
+internal data class CardDetail(
+    internal val pan: String,
+    internal val expiryDate: String,
+    internal val cvv2: String,
+    internal val pin: String,
 )

@@ -28,6 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import java.io.File
@@ -45,6 +46,7 @@ internal interface PaymentService {
     suspend fun createPayment(@Body request: PaymentCreationRequest): Response<PaymentCreationResponse?>
 
     @POST("cps/v1/chargeCard")
+    @Headers("Content-Type: text/plain")
     suspend fun chargeCard(@Body request: EncryptedRequest): Response<EncryptedResponse?>
 
     @POST("cps/v1/authorizeTransaction")

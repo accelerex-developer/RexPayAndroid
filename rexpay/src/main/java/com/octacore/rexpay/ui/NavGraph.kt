@@ -40,7 +40,8 @@ internal fun AppNavGraph(
     ) {
         composable(NavigationItem.SelectionScreen.route) { SelectionScreen(navController = navController) }
         composable(NavigationItem.CardDetailScreen.route) {
-            val factory = CardDetailViewModel.provideFactory(RexPayApp.cardRepo)
+            val factory =
+                CardDetailViewModel.provideFactory(RexPayApp.cardRepo, RexPayApp.basePaymentRepo)
             val viewModel = viewModel<CardDetailViewModel>(factory = factory)
             CardDetailScreen(navController, vm = viewModel)
         }

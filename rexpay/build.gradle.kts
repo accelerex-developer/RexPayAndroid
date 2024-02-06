@@ -1,40 +1,33 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.android.kotlin)
     alias(libs.plugins.android.kotlin.ksp)
 }
 
-fun getCredProps(): Properties {
-    val vPropsFile = rootProject.file("cred.properties")
+fun getCredProps() {
+    val vPropsFile = rootProject.file("./config/rexpay.asc")
+
     if (vPropsFile.exists() || vPropsFile.canRead()) {
-        val vProps = Properties()
-        vProps.load(FileInputStream(vPropsFile))
-        return vProps
+        val output = rootProject.file("./rexpay/src/main/assets/rexpay.asc")
+        vPropsFile.copyTo(output, true)
     } else {
-        throw GradleException("Could not find version.properties")
+        throw GradleException("Could not find rexpay.asc")
     }
 }
 
 android {
     namespace = "com.octacore.rexpay"
-    compileSdk = 34
-
-    val credProps = getCredProps()
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
+        getCredProps()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "API_USERNAME", credProps["API_USERNAME"].toString())
-        buildConfigField("String", "API_PASSWORD", credProps["API_PASSPHRASE"].toString())
-        buildConfigField("String", "API_URL", credProps["API_URL"].toString())
     }
 
     buildTypes {
@@ -90,9 +83,13 @@ dependencies {
     implementation(libs.retrofit.okhttp.logger)
     implementation(libs.airbnb.lottie.anim.compose)
     implementation(libs.google.gson)
-    /*implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)*/
+    implementation(libs.bouncycastle.bcpg)
+    implementation(libs.bouncycastle.bcprov)
+//    implementation(libs.madgag.spongycastle.core)
+//    implementation(libs.madgag.spongycastle.prov)
+//    implementation(libs.madgag.spongycastle.pkix)
+//    implementation(libs.madgag.spongycastle.pg)
+
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

@@ -31,10 +31,11 @@ internal object RexPayApp {
     @JvmStatic
     internal fun init(context: Context, config: ConfigProp) {
         val app = context.applicationContext as Application
+
         val service = PaymentService.getInstance(app, config)
         _baseRepo = BasePaymentRepo.getInstance(service)
         _ussdRepo = USSDTransactionRepo.getInstance(service)
-        _cardRepo = CardTransactionRepo.getInstance(service)
+        _cardRepo = CardTransactionRepo.getInstance(context, service, config)
         _bankRepo = BankTransactionRepo.getInstance(service)
     }
 
