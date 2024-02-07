@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "rexpay"
 include(":app")
 include(":rexpay")
+include(":pgplibs")

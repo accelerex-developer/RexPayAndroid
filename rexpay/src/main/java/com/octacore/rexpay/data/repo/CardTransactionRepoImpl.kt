@@ -38,13 +38,13 @@ internal class CardTransactionRepoImpl(
     private val crypto by lazy { CryptoUtils.getInstance() }
 
     private val clientPubKeyRing by lazy {
-        val keyArray = generateKeyFromFile(config.publicKey)
-        crypto.getPublicKeyRing(keyArray)
+//        val keyArray = generateKeyFromFile(config.publicKey)
+        crypto.getPublicKeyRing(config.publicKey)
     }
 
     private val clientSecKeyRing by lazy {
-        val keyArray = generateKeyFromFile(config.privateKey)
-        crypto.getSecretKeyRing(keyArray)
+//        val keyArray = generateKeyFromFile(config.privateKey)
+        crypto.getSecretKeyRing(config.privateKey)
     }
 
     private val rexPayPubKeyRing by lazy {
