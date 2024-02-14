@@ -35,7 +35,7 @@ internal object RexPayApp {
         val service = PaymentService.getInstance(app, config)
         _baseRepo = BasePaymentRepo.getInstance(service)
         _ussdRepo = USSDTransactionRepo.getInstance(service)
-        _cardRepo = CardTransactionRepo.getInstance(context, service, config)
+        _cardRepo = CardTransactionRepo.getInstance(service, config)
         _bankRepo = BankTransactionRepo.getInstance(service)
     }
 

@@ -2,7 +2,10 @@
 
 package com.octacore.rexpay.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,58 +51,60 @@ internal fun SuccessScreen(
     navController: NavHostController,
     amount: Long?,
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(4.dp),
-        backgroundColor = Color.White,
-        elevation = 2.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(4.dp),
+            backgroundColor = Color.White,
+            elevation = 2.dp
         ) {
-            val composition by rememberLottieComposition(
-                LottieCompositionSpec
-                    .RawRes(R.raw.success_anim)
-            )
-            val progress by animateLottieCompositionAsState(
-                composition,
-                iterations = LottieConstants.IterateForever,
-                isPlaying = true,
-                restartOnPlay = false
-            )
-            LottieAnimation(
-                composition,
-                { progress },
-                modifier = Modifier.size(120.dp)
-            )
-            val annotatedString = buildAnnotatedString {
-                append("You have made a payment of ")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("${amount.formatToNaira()}.")
-                }
-                append("\nWe have sent a receipt to your mail")
-            }
-            Text(
-                text = "Payment Successful",
-                fontWeight = FontWeight.W600,
-                modifier = Modifier.padding(top = 32.dp)
-            )
-            Text(
-                text = annotatedString,
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-            TextButton(
-                onClick = {},
-                modifier = Modifier.padding(top = 32.dp),
-                colors = ButtonDefaults.textButtonColors(contentColor = Red)
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Go to Dashboard", fontSize = 12.sp, fontFamily = PoppinsFamily)
+                val composition by rememberLottieComposition(
+                    LottieCompositionSpec
+                        .RawRes(R.raw.success_anim)
+                )
+                val progress by animateLottieCompositionAsState(
+                    composition,
+                    iterations = LottieConstants.IterateForever,
+                    isPlaying = true,
+                    restartOnPlay = false
+                )
+                LottieAnimation(
+                    composition,
+                    { progress },
+                    modifier = Modifier.size(120.dp)
+                )
+                val annotatedString = buildAnnotatedString {
+                    append("You have made a payment of ")
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("${amount.formatToNaira()}.")
+                    }
+                    append("\nWe have sent a receipt to your mail")
+                }
+                Text(
+                    text = "Payment Successful",
+                    fontWeight = FontWeight.W600,
+                    modifier = Modifier.padding(top = 32.dp)
+                )
+                Text(
+                    text = annotatedString,
+                    textAlign = TextAlign.Center,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+                TextButton(
+                    onClick = {},
+                    modifier = Modifier.padding(top = 32.dp),
+                    colors = ButtonDefaults.textButtonColors(contentColor = Red)
+                ) {
+                    Text(text = "Go to Dashboard", fontSize = 12.sp, fontFamily = PoppinsFamily)
+                }
             }
         }
     }

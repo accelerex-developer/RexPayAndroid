@@ -16,6 +16,7 @@ import com.octacore.rexpay.ui.banktransfer.BankTransferViewModel
 import com.octacore.rexpay.ui.carddetail.CardDetailScreen
 import com.octacore.rexpay.ui.carddetail.CardDetailViewModel
 import com.octacore.rexpay.ui.otp.OtpScreen
+import com.octacore.rexpay.ui.otp.OtpViewModel
 import com.octacore.rexpay.ui.ussd.USSDScreen
 import com.octacore.rexpay.ui.ussd.USSDViewModel
 
@@ -45,7 +46,12 @@ internal fun AppNavGraph(
             val viewModel = viewModel<CardDetailViewModel>(factory = factory)
             CardDetailScreen(navController, vm = viewModel)
         }
-        composable(NavigationItem.OTPScreen.route) { OtpScreen(navController) }
+        composable(NavigationItem.OTPScreen.route) {
+            val factory =
+                OtpViewModel.provideFactory(RexPayApp.cardRepo)
+            val viewModel = viewModel<OtpViewModel>(factory = factory)
+            OtpScreen(navController, vm = viewModel)
+        }
         composable(NavigationItem.BankTransferScreen.route) {
             val factory =
                 BankTransferViewModel.provideFactory(RexPayApp.bankRepo, RexPayApp.basePaymentRepo)

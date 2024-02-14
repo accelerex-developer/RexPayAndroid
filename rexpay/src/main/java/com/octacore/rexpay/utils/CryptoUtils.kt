@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.utils
 
+import org.bouncycastle.bcpg.ArmoredInputStream
 import org.bouncycastle.bcpg.ArmoredOutputStream
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openpgp.PGPCompressedData
@@ -27,6 +28,8 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder
 import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator
+import org.bouncycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder
+import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -53,14 +56,9 @@ internal class CryptoUtils {
 
     @Throws(IOException::class)
     fun getPublicKeyRing(key: ByteArray?): PGPPublicKeyRing {
-        val rings = PGPUtil.getDecoderStream(ByteArrayInputStream(key)).use {
-            val collection = PGPPublicKeyRingCollection(it, fingerprintCalculator)
-            collection.keyRings
-        }
-        if (rings.hasNext()) {
-            return rings.next()
-        }
-        throw PGPException("Public ring not generated")
+        val ais = ArmoredInputStream(ByteArrayInputStream(key))
+        val pgpObjectFactory = PGPObjectFactory(ais, fingerprintCalculator)
+        return pgpObjectFactory.nextObject() as PGPPublicKeyRing
     }
 
     @Throws(IOException::class)
@@ -72,12 +70,12 @@ internal class CryptoUtils {
 
     @Throws(Exception::class)
     fun decrypt(
-        encryptedText: String,
+        encryptedText: String?,
         password: String,
         pgpSecretKeyRing: PGPSecretKeyRing
     ): String? {
         return decrypt(
-            encryptedText.toByteArray(),
+            encryptedText?.toByteArray(),
             password,
             pgpSecretKeyRing
         )?.let { return String(it) }
@@ -85,23 +83,23 @@ internal class CryptoUtils {
 
     @Throws(Exception::class)
     fun decrypt(
-        encrypted: ByteArray,
+        encrypted: ByteArray?,
         password: String,
         pgpSecretKeyRing: PGPSecretKeyRing
     ): ByteArray? {
         var inputStream: InputStream = ByteArrayInputStream(encrypted)
         inputStream = PGPUtil.getDecoderStream(inputStream)
         val pgpF = PGPObjectFactory(inputStream, fingerprintCalculator)
-        val enc: PGPEncryptedDataList
+        val enc: PGPEncryptedDataList?
         val o = pgpF.nextObject()
         enc = if (o is PGPEncryptedDataList) {
             o
         } else {
-            pgpF.nextObject() as PGPEncryptedDataList
+            pgpF.nextObject() as? PGPEncryptedDataList
         }
         var sKey: PGPPrivateKey? = null
         var pbe: PGPPublicKeyEncryptedData? = null
-        while (sKey == null && enc.encryptedDataObjects.hasNext()) {
+        while (sKey == null && enc?.encryptedDataObjects?.hasNext() == true) {
             pbe = enc.encryptedDataObjects.next() as PGPPublicKeyEncryptedData
             sKey = getPrivateKey(pgpSecretKeyRing, pbe.keyID, password.toCharArray())
         }
@@ -142,7 +140,7 @@ internal class CryptoUtils {
         val lData = PGPLiteralDataGenerator()
         val pOut = lData.open(
             cos,
-            PGPLiteralData.UTF8,
+            PGPLiteralData.BINARY,
             PGPLiteralData.CONSOLE,
             msg.size.toLong(),
             Date()
@@ -150,15 +148,15 @@ internal class CryptoUtils {
         pOut.write(msg)
         lData.close()
         comData.close()
-        val encGen = BcPGPDataEncryptorBuilder(PGPEncryptedData.AES_256)
-            .setWithIntegrityPacket(true)
-            .setSecureRandom(SecureRandom()).let {
-                PGPEncryptedDataGenerator(it)
-            }
-        val method = BcPublicKeyKeyEncryptionMethodGenerator(encKey).apply {
-            setSecureRandom(SecureRandom())
-        }
-        encGen.addMethod(method)
+        val encGen = PGPEncryptedDataGenerator(
+            JcePGPDataEncryptorBuilder(PGPEncryptedData.AES_256).setWithIntegrityPacket(true)
+                .setSecureRandom(SecureRandom()).setProvider(BouncyCastleProvider.PROVIDER_NAME)
+        )
+        encGen.addMethod(
+            JcePublicKeyKeyEncryptionMethodGenerator(encKey).setProvider(
+                BouncyCastleProvider.PROVIDER_NAME
+            )
+        )
         val bytes = bOut.toByteArray()
         val cOut = encGen.open(out, bytes.size.toLong())
         cOut.write(bytes)
@@ -169,11 +167,11 @@ internal class CryptoUtils {
 
     @Throws(PGPException::class, IllegalArgumentException::class)
     private fun getPublicKey(publicKeyRing: PGPPublicKeyRing): PGPPublicKey {
-        val keys = publicKeyRing.publicKeys
-        while (keys.hasNext()) {
-            val key = keys.next() as PGPPublicKey
-            if (key.isEncryptionKey) {
-                return key
+        val kIt = publicKeyRing.publicKeys
+        while (kIt.hasNext()) {
+            val k = kIt.next() as PGPPublicKey
+            if (k.isEncryptionKey) {
+                return k
             }
         }
         throw IllegalArgumentException("Can't find encryption key in key ring.")

@@ -10,6 +10,6 @@ package com.octacore.rexpay.data.remote.models
  * Date            : 27/01/2024
  **************************************************************************************************/
 internal data class KeyRequest(
-    internal val clientId: String,
-    internal val publicKey: String,
+    internal val clientId: String?,
+    internal val publicKey: String?,
 )

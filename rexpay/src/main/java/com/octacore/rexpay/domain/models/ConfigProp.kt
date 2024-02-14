@@ -6,6 +6,7 @@ import android.content.Context
 import com.octacore.rexpay.utils.InputOutputUtils
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -20,9 +21,13 @@ class ConfigProp private constructor() {
 
     private var _password: String = ""
 
+    private var _passphrase: String = ""
+
     private var _publicKey: ByteArray? = null
 
     private var _privateKey: ByteArray? = null
+
+    private var _rexPayKey: ByteArray? = null
 
     private var _baseUrl: String = "https://pgs-sandbox.globalaccelerex.com/api/"
 
@@ -31,65 +36,80 @@ class ConfigProp private constructor() {
         password: String?,
         baseUrl: String?,
         publicKey: ByteArray?,
-        privateKey: ByteArray?
+        privateKey: ByteArray?,
+        rexPayPubKey: ByteArray?,
+        passphrase: String?
     ) : this() {
-        if (username == null) throw NullPointerException("Username cannot be missing")
+        if (username == null) throw NullPointerException("API Username cannot be missing")
         this._username = username
 
-        if (password == null) throw NullPointerException("Passphrase cannot be missing")
+        if (password == null) throw NullPointerException("API Password cannot be missing")
         this._password = password
+
+        if (passphrase == null) throw NullPointerException("Passphrase cannot be missing")
+        this._passphrase = passphrase
 
         this._baseUrl = baseUrl ?: _baseUrl
 
         this._publicKey = publicKey
 
         this._privateKey = privateKey
+
+        this._rexPayKey = rexPayPubKey
     }
 
     constructor(
-        username: String?,
-        password: String?,
+        apiUsername: String?,
+        apiPassword: String?,
         baseUrl: String?,
-        publicKey: File?,
-        privateKey: File?
+        clientPGPPublicKey: File?,
+        clientPGPPrivateKey: File?,
+        rexPayPGPPublicKey: File?,
+        pgpPassPhrase: String?,
     ) : this() {
-        if (username == null) throw NullPointerException("Username cannot be missing")
-        this._username = username
+        if (apiUsername == null) throw NullPointerException("API Username cannot be missing")
+        this._username = apiUsername
 
-        if (password == null) throw NullPointerException("Passphrase cannot be missing")
-        this._password = password
+        if (apiPassword == null) throw NullPointerException("API Password cannot be missing")
+        this._password = apiPassword
+
+        if (pgpPassPhrase == null) throw NullPointerException("Passphrase cannot be missing")
+        this._password = apiPassword
 
         this._baseUrl = baseUrl ?: _baseUrl
 
-        this._publicKey = generateKeyFromFile(publicKey)
+        this._publicKey = generateKeyFromFile(clientPGPPublicKey)
 
-        this._privateKey = generateKeyFromFile(privateKey)
+        this._privateKey = generateKeyFromFile(clientPGPPrivateKey)
+
+        this._rexPayKey = generateKeyFromFile(rexPayPGPPublicKey)
     }
 
     constructor(
-        context: Context,
-        username: String?,
-        password: String?,
+        apiUsername: String?,
+        apiPassword: String?,
         baseUrl: String?,
-        publicKey: String?,
-        privateKey: String?
+        clientPGPPublicKey: String?,
+        clientPGPPrivateKey: String?,
+        rexPayPGPPublicKey: String?,
+        pgpPassPhrase: String?,
     ) : this() {
-        InputOutputUtils.clearCache(context)
-        if (username == null) throw NullPointerException("Username cannot be missing")
-        this._username = username
+        if (apiUsername == null) throw NullPointerException("API Username cannot be missing")
+        this._username = apiUsername
 
-        if (password == null) throw NullPointerException("Passphrase cannot be missing")
-        this._password = password
+        if (apiPassword == null) throw NullPointerException("API Password cannot be missing")
+        this._password = apiPassword
+
+        if (pgpPassPhrase == null) throw NullPointerException("Passphrase cannot be missing")
+        this._password = apiPassword
 
         this._baseUrl = baseUrl ?: _baseUrl
 
-        this._publicKey = publicKey?.toByteArray()
+        this._publicKey = clientPGPPublicKey?.toByteArray()
 
-        this._privateKey = privateKey?.toByteArray()
+        this._privateKey = clientPGPPrivateKey?.toByteArray()
 
-//        this._publicKey = InputOutputUtils.generateTempFile("pub", publicKey, context)
-
-//        this._privateKey = InputOutputUtils.generateTempFile("sec", privateKey, context)
+        this._rexPayKey = rexPayPGPPublicKey?.toByteArray()
     }
 
     internal val username: String
@@ -107,48 +127,30 @@ class ConfigProp private constructor() {
     internal val privateKey: ByteArray
         get() = _privateKey!!
 
+    internal val rexPayKey: ByteArray
+        get() = _rexPayKey!!
+
+    internal val passphrase: String
+        get() = _passphrase
+
     internal fun copy(
         username: String = this._username,
         password: String = this._password,
         baseUrl: String = this._baseUrl,
         publicKey: ByteArray? = this._publicKey,
         privateKey: ByteArray? = this._privateKey,
+        rexPayKey: ByteArray? = this._rexPayKey,
+        passphrase: String? = this._passphrase,
     ): ConfigProp {
-        return ConfigProp(username, password, baseUrl, publicKey, privateKey)
-    }
-
-    class Builder(private val context: Context) {
-        private var config: ConfigProp = ConfigProp()
-
-        init {
-            InputOutputUtils.clearCache(context)
-        }
-
-        fun username(value: String) = apply { config = config.copy(username = value) }
-
-        fun password(value: String) = apply { config = config.copy(password = value) }
-
-        fun baseUrl(value: String) = apply {
-            config = config.copy(baseUrl = value)
-        }
-
-        fun publicKey(value: String) = apply {
-//            val file = InputOutputUtils.generateTempFile("pub", value, context)
-            config = config.copy(publicKey = value.toByteArray())
-        }
-
-        fun publicKey(value: File?) =
-            apply { config = config.copy(publicKey = generateKeyFromFile(value)) }
-
-        fun privateKey(value: String) = apply {
-//            val file = InputOutputUtils.generateTempFile("sec", value, context)
-            config = config.copy(privateKey = value.toByteArray())
-        }
-
-        fun privateKey(value: File?) =
-            apply { config = config.copy(privateKey = generateKeyFromFile(value)) }
-
-        fun build(): ConfigProp = config
+        return ConfigProp(
+            username = username,
+            password = password,
+            baseUrl = baseUrl,
+            publicKey = publicKey,
+            privateKey = privateKey,
+            rexPayPubKey = rexPayKey,
+            passphrase = passphrase
+        )
     }
 
     override fun equals(other: Any?): Boolean {
@@ -157,19 +159,32 @@ class ConfigProp private constructor() {
 
         other as ConfigProp
 
-        if (username != other.username) return false
-        if (password != other.password) return false
-        if (baseUrl != other.baseUrl) return false
-        if (!publicKey.contentEquals(other.publicKey)) return false
-        return privateKey.contentEquals(other.privateKey)
+        if (_username != other._username) return false
+        if (_password != other._password) return false
+        if (_passphrase != other._passphrase) return false
+        if (_publicKey != null) {
+            if (other._publicKey == null) return false
+            if (!_publicKey.contentEquals(other._publicKey)) return false
+        } else if (other._publicKey != null) return false
+        if (_privateKey != null) {
+            if (other._privateKey == null) return false
+            if (!_privateKey.contentEquals(other._privateKey)) return false
+        } else if (other._privateKey != null) return false
+        if (_rexPayKey != null) {
+            if (other._rexPayKey == null) return false
+            if (!_rexPayKey.contentEquals(other._rexPayKey)) return false
+        } else if (other._rexPayKey != null) return false
+        return _baseUrl == other._baseUrl
     }
 
     override fun hashCode(): Int {
-        var result = username.hashCode()
-        result = 31 * result + password.hashCode()
-        result = 31 * result + baseUrl.hashCode()
-        result = 31 * result + publicKey.contentHashCode()
-        result = 31 * result + privateKey.contentHashCode()
+        var result = _username.hashCode()
+        result = 31 * result + _password.hashCode()
+        result = 31 * result + _passphrase.hashCode()
+        result = 31 * result + (_publicKey?.contentHashCode() ?: 0)
+        result = 31 * result + (_privateKey?.contentHashCode() ?: 0)
+        result = 31 * result + (_rexPayKey?.contentHashCode() ?: 0)
+        result = 31 * result + _baseUrl.hashCode()
         return result
     }
 
@@ -179,11 +194,77 @@ class ConfigProp private constructor() {
                 "password='$password', " +
                 "baseUrl='$baseUrl', " +
                 "publicKey=${publicKey.contentToString()}, " +
-                "privateKey=${privateKey.contentToString()}" +
+                "privateKey=${privateKey.contentToString()}, " +
+                "rexPayKey=${rexPayKey.contentToString()}, " +
+                "passphrase='$passphrase'" +
                 ")"
     }
 
+    class Builder(context: Context) {
+        private var config: ConfigProp = ConfigProp()
+
+        init {
+            InputOutputUtils.clearCache(context)
+        }
+
+        fun apiUsername(value: String) = apply { config = config.copy(username = value) }
+
+        fun apiPassword(value: String) = apply { config = config.copy(password = value) }
+
+        fun baseUrl(value: String) = apply {
+            config = config.copy(baseUrl = value)
+        }
+
+        fun clientPGPPublicKey(value: String) = apply {
+            config = config.copy(publicKey = value.toByteArray())
+        }
+
+        fun clientPGPPublicKey(value: File?) =
+            apply { config = config.copy(publicKey = generateKeyFromFile(value)) }
+
+        fun clientPGPPublicKey(value: InputStream?) =
+            apply { config = config.copy(publicKey = genKeyFromInputStream(value)) }
+
+        fun clientPGPPrivateKey(value: String) = apply {
+            config = config.copy(privateKey = value.toByteArray())
+        }
+
+        fun clientPGPPrivateKey(value: File?) =
+            apply { config = config.copy(privateKey = generateKeyFromFile(value)) }
+
+        fun clientPGPPrivateKey(value: InputStream?) =
+            apply { config = config.copy(privateKey = genKeyFromInputStream(value)) }
+
+        fun rexPayPGPPublicKey(value: String) = apply {
+            config = config.copy(rexPayKey = value.toByteArray())
+        }
+
+        fun rexPayPGPPublicKey(value: File?) =
+            apply { config = config.copy(rexPayKey = generateKeyFromFile(value)) }
+
+        fun rexPayPGPPublicKey(value: InputStream?) =
+            apply { config = config.copy(rexPayKey = genKeyFromInputStream(value)) }
+
+        fun passphrase(value: String) = apply { config = config.copy(passphrase = value) }
+
+        fun build(): ConfigProp = config
+    }
+
+
     companion object {
+        private fun genKeyFromInputStream(stream: InputStream?): ByteArray? {
+            return stream?.let {
+                try {
+                    stream.readBytes().also { println(String(it)) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                } finally {
+                    stream.close()
+                }
+            }
+        }
+
         private fun generateKeyFromFile(file: File?): ByteArray? {
             return file?.let {
                 try {

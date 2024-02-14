@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.data.remote.models
 
+import com.google.gson.annotations.SerializedName
 import com.octacore.rexpay.domain.models.PayPayload
 
 /***************************************************************************************************
@@ -17,6 +18,7 @@ internal data class PaymentCreationRequest(
     internal val currency: String?,
     internal val userId: String?,
     internal val callbackUrl: String?,
+    @SerializedName("metadata")
     internal val metaData: MetaData?,
 ) {
     internal data class MetaData(

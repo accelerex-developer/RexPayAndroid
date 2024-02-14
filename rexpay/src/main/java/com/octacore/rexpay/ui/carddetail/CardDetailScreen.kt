@@ -2,6 +2,8 @@
 
 package com.octacore.rexpay.ui.carddetail
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,18 +11,28 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,6 +71,16 @@ internal fun CardDetailScreen(
     val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 
+    val res = uiState.response
+    if (res != null) {
+        if (res.responseCode == "T0") {
+            val options = NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .build()
+            navController.navigate(NavigationItem.OTPScreen.route, options)
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.Center
     ) {
@@ -78,13 +100,18 @@ internal fun CardDetailScreen(
                 TextOutlineForm(
                     value = vm.cardholder.textFieldValue,
                     label = "Card Number",
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     visualTransformation = vm.cardholder.visualTransformation,
+                    trailingIcon = vm.cardholder.suffixIcon,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                ) { vm.cardholder.formatCreditCard(it) }
+                ) {
+                    vm.cardholder.formatCreditCard(it)
+                    vm.checkValues()
+                }
                 Row(
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
@@ -93,13 +120,17 @@ internal fun CardDetailScreen(
                             .padding(end = 8.dp)
                             .weight(1f),
                         value = vm.expiryDate.textFieldValue,
+                        isError = vm.expiryDate.isInvalid ?: false,
                         visualTransformation = vm.expiryDate.visualTransformation,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next
                         ),
                         label = "Expiry Date"
-                    ) { vm.expiryDate.formatExpiryDate(it) }
+                    ) {
+                        vm.expiryDate.formatExpiryDate(it)
+                        vm.checkValues()
+                    }
                     TextOutlineForm(
                         modifier = Modifier
                             .padding(start = 8.dp)
@@ -110,8 +141,11 @@ internal fun CardDetailScreen(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next
-                        )
-                    ) { if (it.length in 0..3) vm.cvv = it }
+                        ),
+                    ) {
+                        if (it.length in 0..3) vm.cvv = it
+                        vm.checkValues()
+                    }
                 }
                 TextOutlineForm(
                     modifier = Modifier
@@ -129,25 +163,30 @@ internal fun CardDetailScreen(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
                     )
-                ) { if (it.length in 0..6) vm.pin = it }
+                ) {
+                    if (it.length in 0..6) vm.pin = it
+                    vm.checkValues()
+                }
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 24.dp),
-                    onClick = {
-                        vm.initiateCardPayment()
-                        /*val options = NavOptions.Builder()
-                            .setLaunchSingleTop(true)
-                            .build()
-                        navController.navigate(NavigationItem.OTPScreen.route, options)*/
-                    },
+                    enabled = !uiState.isLoading && vm.enableButton,
+                    onClick = { vm.initiateCardPayment() },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Red,
                         contentColor = Color.White
                     ),
                     contentPadding = PaddingValues(vertical = 12.dp),
                     content = {
-                        Text(text = "Pay")
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(text = "Proceed")
+                        }
                     }
                 )
             }
@@ -163,6 +202,7 @@ internal fun TextOutlineForm(
     labelAlign: Alignment = Alignment.CenterStart,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions(),
     textStyle: TextStyle = LocalTextStyle.current,
     onChange: (String) -> Unit
 ) {
@@ -172,6 +212,7 @@ internal fun TextOutlineForm(
         singleLine = true,
         modifier = modifier,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         visualTransformation = visualTransformation,
         textStyle = textStyle,
         placeholder = {
@@ -185,28 +226,33 @@ internal fun TextOutlineForm(
             }
         },
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = lineGray.copy(alpha = 0.32F),
-            unfocusedBorderColor = lineGray.copy(alpha = 0.32F)
+            focusedBorderColor = lineGray.copy(alpha = 0.64F),
+            unfocusedBorderColor = lineGray.copy(alpha = 0.64F)
         )
     )
 }
 
 @Composable
 internal fun TextOutlineForm(
+    modifier: Modifier = Modifier,
     value: TextFieldValue,
     label: String,
-    modifier: Modifier = Modifier,
+    isError: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions(),
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    onChange: (TextFieldValue) -> Unit
+    @DrawableRes trailingIcon: Int? = null,
+    onChange: (TextFieldValue) -> Unit,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
         singleLine = true,
         modifier = modifier,
+        isError = isError,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         textStyle = textStyle,
         visualTransformation = visualTransformation,
         placeholder = {
@@ -216,9 +262,18 @@ internal fun TextOutlineForm(
                 color = textGray.copy(alpha = 0.72F)
             )
         },
+        trailingIcon = trailingIcon?.let {
+            {
+                Image(
+                    painter = painterResource(id = trailingIcon),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = lineGray.copy(alpha = 0.32F),
-            unfocusedBorderColor = lineGray.copy(alpha = 0.32F)
+            focusedBorderColor = lineGray.copy(alpha = 0.64F),
+            unfocusedBorderColor = lineGray.copy(alpha = 0.64F)
         )
     )
 }

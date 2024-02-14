@@ -5,16 +5,19 @@ package com.octacore.rexpay.ui.carddetail
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.data.BaseResult
+import com.octacore.rexpay.data.remote.models.ChargeCardResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.CardDetail
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.utils.CreditCardFormatter
 import com.octacore.rexpay.utils.ExpiryDateFormatter
+import com.octacore.rexpay.utils.LogUtils
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,13 +45,25 @@ internal class CardDetailViewModel(
     var cvv by mutableStateOf("")
     var pin by mutableStateOf("")
 
+    var enableButton by mutableStateOf(false)
+
     internal fun initiateCardPayment() {
         _uiState.update { CardDetailUiState(isLoading = true) }
         viewModelScope.launch {
             val payment = async { createPayment() }.await()
-            val response = async { chargeCard(payment) }.await()
-            _uiState.update { CardDetailUiState(status = response) }
+            if (payment != null) {
+                val response = async { chargeCard(payment) }.await()
+                _uiState.update { CardDetailUiState(response = response) }
+            }
         }
+    }
+
+    internal fun checkValues() {
+        val validCard = cardholder.isInvalid
+        val validDate = expiryDate.isInvalid
+        val validCvv = cvv.length == 3
+        val validPin = pin.length == 4
+        enableButton = validCard == false && validDate == false && validCvv && validPin
     }
 
     private suspend fun createPayment(): PaymentCreationResponse? {
@@ -62,7 +77,7 @@ internal class CardDetailViewModel(
         }
     }
 
-    private suspend fun chargeCard(payment: PaymentCreationResponse?): String? {
+    private suspend fun chargeCard(payment: PaymentCreationResponse?): ChargeCardResponse? {
         val card = CardDetail(
             pan = cardholder.textFieldValue.text,
             cvv2 = cvv,
@@ -96,5 +111,5 @@ internal class CardDetailViewModel(
 internal data class CardDetailUiState(
     val isLoading: Boolean = false,
     val errorMsg: BaseResult.Error? = null,
-    val status: String? = null
+    val response: ChargeCardResponse? = null,
 )
