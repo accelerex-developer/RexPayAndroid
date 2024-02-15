@@ -38,10 +38,6 @@ internal class CardTransactionRepoImpl(
 
     private val crypto by lazy { CryptoUtils.getInstance() }
 
-    private val clientPubKeyRing by lazy {
-        crypto.getPublicKeyRing(config.publicKey)
-    }
-
     private val clientSecKeyRing by lazy {
         crypto.getSecretKeyRing(config.privateKey)
     }
@@ -73,6 +69,7 @@ internal class CardTransactionRepoImpl(
             val res = chargeCard(payload)
             if (res is BaseResult.Success) {
                 chargeResponse = res.result
+                LogUtils.i(chargeResponse.toString())
             }
             return@withContext res
         }

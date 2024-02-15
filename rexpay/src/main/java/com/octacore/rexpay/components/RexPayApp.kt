@@ -32,7 +32,7 @@ internal object RexPayApp {
     internal fun init(context: Context, config: ConfigProp) {
         val app = context.applicationContext as Application
 
-        val service = PaymentService.getInstance(app, config)
+        val service = PaymentService.getInstance(config)
         _baseRepo = BasePaymentRepo.getInstance(service)
         _ussdRepo = USSDTransactionRepo.getInstance(service)
         _cardRepo = CardTransactionRepo.getInstance(service, config)

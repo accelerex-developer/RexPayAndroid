@@ -74,7 +74,7 @@ internal interface PaymentService {
         private var INSTANCE: PaymentService? = null
 
         @JvmStatic
-        fun getInstance(context: Context, config: ConfigProp): PaymentService {
+        fun getInstance(config: ConfigProp): PaymentService {
             return INSTANCE ?: synchronized(this) {
                 val logInterceptor = HttpLoggingInterceptor()
                 if (LogUtils.showLog) {
@@ -85,8 +85,8 @@ internal interface PaymentService {
 
                 val client = OkHttpClient.Builder()
                     .readTimeout(2, TimeUnit.MINUTES)
+                    .writeTimeout(2, TimeUnit.MINUTES)
                     .connectTimeout(2, TimeUnit.MINUTES)
-                    .retryOnConnectionFailure(true)
                     .addInterceptor(AuthInterceptor(config))
                     .addInterceptor(logInterceptor)
                     .build()

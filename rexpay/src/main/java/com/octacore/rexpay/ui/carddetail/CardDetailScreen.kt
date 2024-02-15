@@ -46,9 +46,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.octacore.rexpay.R
 import com.octacore.rexpay.data.cache.Cache
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
+import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.NavigationItem
 import com.octacore.rexpay.ui.theme.Red
 import com.octacore.rexpay.ui.theme.lineGray
@@ -78,7 +86,29 @@ internal fun CardDetailScreen(
                 .setLaunchSingleTop(true)
                 .build()
             navController.navigate(NavigationItem.OTPScreen.route, options)
+        } else if (res.responseCode == "01") {
+            ErrorDialog(
+                onClose = {
+//                    val err = PayResult.Error(uiState.errorMsg)
+//                    manager.onResponse(err)
+//                    vm.reset()
+                },
+                onContinue = { },
+                message = res.responseDescription ?: "Something went wrong"
+            )
         }
+    }
+
+    if (uiState.errorMsg != null) {
+        ErrorDialog(
+            onClose = {
+//                    val err = PayResult.Error(uiState.errorMsg)
+//                    manager.onResponse(err)
+//                    vm.reset()
+            },
+            onContinue = { },
+            message = uiState.errorMsg?.message ?: "Something went wrong"
+        )
     }
 
     Column(
@@ -276,4 +306,42 @@ internal fun TextOutlineForm(
             unfocusedBorderColor = lineGray.copy(alpha = 0.64F)
         )
     )
+}
+
+@Composable
+private fun ErrorDialog(
+    onClose: () -> Unit,
+    onContinue: () -> Unit,
+    message: String,
+) {
+    CustomDialog(
+        positiveText = "Retry",
+        negativeText = "Cancel",
+        horizontalAlignment = Alignment.CenterHorizontally,
+        onDismissRequest = { },
+        onPositiveClicked = onContinue,
+        onNegativeClicked = onClose
+    ) {
+        val composition by rememberLottieComposition(
+            LottieCompositionSpec
+                .RawRes(R.raw.error_anim)
+        )
+        val progress by animateLottieCompositionAsState(
+            composition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true,
+            restartOnPlay = false
+        )
+        LottieAnimation(
+            composition,
+            { progress },
+            modifier = Modifier.size(120.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = message,
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+        )
+    }
 }
