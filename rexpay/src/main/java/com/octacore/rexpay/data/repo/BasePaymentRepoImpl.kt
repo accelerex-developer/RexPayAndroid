@@ -21,6 +21,7 @@ internal class BasePaymentRepoImpl(private val service: PaymentService) : BasePa
     private val cache by lazy { Cache.getInstance() }
 
     override suspend fun initiatePayment(): BaseResult<PaymentCreationResponse?> {
+        cache.hasSession = null
         val request = PaymentCreationRequest(cache.payload)
         return processRequest { service.createPayment(request) }
     }

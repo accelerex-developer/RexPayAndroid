@@ -23,7 +23,9 @@ internal interface USSDTransactionRepo {
         bank: USSDBank?
     ): BaseResult<ChargeUssdResponse?>
 
-    suspend fun checkTransactionStatus(reference: String?, clientId: String?): BaseResult<UssdPaymentDetailResponse?>
+    suspend fun checkTransactionStatus(reference: String?): BaseResult<UssdPaymentDetailResponse?>
+
+    fun close()
 
     companion object {
         @Volatile

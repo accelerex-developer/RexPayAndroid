@@ -42,9 +42,9 @@ sealed class PayResult {
     }
 
     enum class TransactionStatus {
-        SUCCESS,
+        APPROVED,
         PENDING,
-        FAILURE,
+        DECLINED,
         UNKNOWN
     }
 }
@@ -52,7 +52,7 @@ sealed class PayResult {
 @JvmSynthetic
 internal fun String?.transactionStatus(): PayResult.TransactionStatus {
     return when (this) {
-        "00" -> PayResult.TransactionStatus.SUCCESS
+        "00" -> PayResult.TransactionStatus.APPROVED
         else -> PayResult.TransactionStatus.UNKNOWN
     }
 }

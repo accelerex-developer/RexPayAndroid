@@ -102,4 +102,9 @@ internal class RexPayActivity : ComponentActivity() {
             )
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        RexPayApp.ussdRepo.close()
+    }
 }

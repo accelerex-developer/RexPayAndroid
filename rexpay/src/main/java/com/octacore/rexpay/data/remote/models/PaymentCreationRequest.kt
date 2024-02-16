@@ -4,6 +4,7 @@ package com.octacore.rexpay.data.remote.models
 
 import com.google.gson.annotations.SerializedName
 import com.octacore.rexpay.domain.models.PayPayload
+import java.util.UUID
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -27,7 +28,7 @@ internal data class PaymentCreationRequest(
     )
 
     constructor(payload: PayPayload?) : this(
-        reference = payload?.reference,
+        reference = UUID.randomUUID().toString().replace(Regex("\\W"), ""),
         amount = payload?.amount,
         currency = payload?.currency,
         userId = payload?.userId,

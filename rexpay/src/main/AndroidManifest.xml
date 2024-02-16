@@ -8,6 +8,7 @@
             android:name=".components.RexPayActivity"
             android:exported="false"
             android:label="@string/title_activity_payment"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Rexpay" />
     </application>
 

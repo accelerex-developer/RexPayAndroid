@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.ui.ussd
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,16 +39,30 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.octacore.rexpay.R
+import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.cache.Cache
+import com.octacore.rexpay.data.remote.models.ChargeCardResponse
+import com.octacore.rexpay.data.remote.models.ChargeUssdResponse
+import com.octacore.rexpay.data.remote.models.UssdPaymentDetailResponse
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
+import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.theme.PoppinsFamily
 import com.octacore.rexpay.ui.theme.PurpleGrey40
 import com.octacore.rexpay.ui.theme.Red
 import com.octacore.rexpay.ui.theme.lineGray
 import com.octacore.rexpay.ui.theme.textBlack
 import com.octacore.rexpay.ui.theme.textGray
+import com.octacore.rexpay.utils.LogUtils
 import com.octacore.rexpay.utils.listFromAsset
 
 /***************************************************************************************************
@@ -62,10 +77,59 @@ import com.octacore.rexpay.utils.listFromAsset
 internal fun USSDScreen(
     navController: NavHostController,
     vm: USSDViewModel = viewModel(),
+    context: Context = LocalContext.current,
+    manager: PaymentManager = PaymentManager.getInstance()
 ) {
     val cache by lazy { Cache.getInstance() }
-    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val chargeState by vm.chargeUSSDState.collectAsStateWithLifecycle()
+    val verifyState by vm.verifyUSSDState.collectAsStateWithLifecycle()
     var isExpanded by remember { mutableStateOf(false) }
+
+    fun goBack(res: ChargeUssdResponse? = null, verify: UssdPaymentDetailResponse? = null) {
+        val start = navController.graph.startDestinationId
+        navController.popBackStack(start, true)
+        val error = res?.let {
+            BaseResult.Error(
+                message = it.providerResponse ?: "Transaction could not be completed",
+                code = "01"
+            )
+        } ?: verify?.let {
+            BaseResult.Error(
+                message = it.providerResponse ?: "Transaction could not be completed",
+                code = "01"
+            )
+        } ?: chargeState.errorMsg ?: verifyState.errorMsg
+        val result = PayResult.Error(error)
+        manager.onResponse(context, result)
+    }
+
+    if (chargeState.errorMsg != null) {
+        ErrorDialog(
+            showCancel = false,
+            positiveText = "Okay",
+            onClose = { goBack() },
+            onContinue = { vm.reset(1) },
+            message = chargeState.errorMsg?.message ?: "Something went wrong"
+        )
+    }
+
+    if (verifyState.errorMsg != null) {
+        ErrorDialog(
+            onClose = { goBack() },
+            onContinue = { vm.reset(2) },
+            message = verifyState.errorMsg?.message ?: "Something went wrong"
+        )
+    }
+
+    val verifyRes = verifyState.response
+    if (verifyRes != null) {
+        if (verifyRes.status == "ONGOING") {
+            PendingDialog(
+                message = verifyRes.statusMessage,
+                close = { vm.reset(2) },
+            )
+        }
+    }
 
     Column(verticalArrangement = Arrangement.Center) {
         BaseTopNav(navController = navController)
@@ -84,8 +148,12 @@ internal fun USSDScreen(
                 BankSelector(
                     isExpanded = isExpanded,
                     selectedBank = vm.selectedBank.value,
-                    isLoading = uiState.isLoading,
-                    onExpandedChanged = { isExpanded = it },
+                    isLoading = chargeState.isLoading,
+                    onExpandedChanged = {
+                        if (!verifyState.isLoading) {
+                            isExpanded = it
+                        }
+                    },
                     onDismiss = { isExpanded = false },
                     onSelected = {
                         vm.onBankSelected(it)
@@ -100,7 +168,7 @@ internal fun USSDScreen(
                         .background(color = PurpleGrey40.copy(alpha = 0.1F)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (uiState.response == null) {
+                    if (chargeState.response == null) {
                         Text(
                             text = "Your USSD Payment code will appear here",
                             fontSize = 12.sp,
@@ -114,21 +182,28 @@ internal fun USSDScreen(
                         ) {
                             Text(text = "Dial the below code to complete payment", fontSize = 12.sp)
                             Text(
-                                text = uiState.response?.providerResponse ?: "",
+                                text = chargeState.response?.providerResponse ?: "",
                                 fontWeight = FontWeight.W600,
                                 fontSize = 24.sp,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
                             TextButton(
-                                onClick = { vm.checkTransactionStatus(uiState.response?.reference) },
+                                onClick = { vm.checkTransactionStatus(chargeState.response?.reference) },
                                 colors = ButtonDefaults.textButtonColors(contentColor = Red)
                             ) {
-                                Text(
-                                    text = "Check Transaction Status",
-                                    fontSize = 12.sp,
-                                    fontFamily = PoppinsFamily,
-                                    textDecoration = TextDecoration.Underline,
-                                )
+                                if (verifyState.isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(
+                                        text = "Check Transaction Status",
+                                        fontSize = 12.sp,
+                                        fontFamily = PoppinsFamily,
+                                        textDecoration = TextDecoration.Underline,
+                                    )
+                                }
                             }
                         }
                     }
@@ -197,5 +272,83 @@ private fun BankSelector(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ErrorDialog(
+    onClose: () -> Unit,
+    onContinue: () -> Unit,
+    message: String,
+    showRetry: Boolean = true,
+    showCancel: Boolean = true,
+    positiveText: String = "Retry",
+    negativeText: String = "Cancel"
+) {
+    CustomDialog(
+        positiveText = if (showRetry) positiveText else null,
+        negativeText = if (showCancel) negativeText else null,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        onDismissRequest = { },
+        onPositiveClicked = onContinue,
+        onNegativeClicked = onClose
+    ) {
+        val composition by rememberLottieComposition(
+            LottieCompositionSpec
+                .RawRes(R.raw.error_anim)
+        )
+        val progress by animateLottieCompositionAsState(
+            composition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true,
+            restartOnPlay = false
+        )
+        LottieAnimation(
+            composition,
+            { progress },
+            modifier = Modifier.size(120.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = message,
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+        )
+    }
+}
+
+@Composable
+private fun PendingDialog(
+    message: String?,
+    close: () -> Unit,
+) {
+    CustomDialog(
+        negativeText = "Close",
+        horizontalAlignment = Alignment.CenterHorizontally,
+        onDismissRequest = {},
+        onPositiveClicked = {},
+        onNegativeClicked = close
+    ) {
+        val composition by rememberLottieComposition(
+            LottieCompositionSpec
+                .RawRes(R.raw.pending_anim)
+        )
+        val progress by animateLottieCompositionAsState(
+            composition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true,
+            restartOnPlay = false
+        )
+        LottieAnimation(
+            composition,
+            { progress },
+            modifier = Modifier.size(120.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = message ?: "",
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+        )
     }
 }

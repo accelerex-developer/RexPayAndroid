@@ -33,17 +33,6 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
 
         RexPay.init(this, config)
 
-        val payload = PayPayload(
-            reference = UUID.randomUUID().toString()
-                .replace(Regex("\\W"), ""),
-            amount = 100,
-            currency = "NGN",
-            userId = "random.user@email.com",
-            callbackUrl = "",
-            email = "random.user@email.com",
-            customerName = "Random User"
-        )
-
         val rexPay = RexPay.getInstance()
         rexPay.setPaymentListener(this@MainActivity)
 
@@ -57,6 +46,16 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
                     Button(
                         modifier = Modifier.wrapContentSize(),
                         onClick = {
+                            val payload = PayPayload(
+                                reference = UUID.randomUUID().toString()
+                                    .replace(Regex("\\W"), ""),
+                                amount = 100,
+                                currency = "NGN",
+                                userId = "random.user@email.com",
+                                callbackUrl = "",
+                                email = "random.user@email.com",
+                                customerName = "Random User"
+                            )
                             rexPay.makePayment(this@MainActivity, payload)
                         }
                     ) {
