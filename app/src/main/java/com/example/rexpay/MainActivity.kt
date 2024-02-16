@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
         val config = ConfigProp.Builder(this)
             .apiUsername("talk2phasahsyyahoocom")
             .apiPassword("f0bedbea93df09264a4f09a6b38de6e9b924b6cb92bf4a0c07ce46f26f85")
-            .baseUrl("https://pgs-sandbox.globalaccelerex.com/api/")
+            .isTest(false)
             .clientPGPPrivateKey(assets.open("0xE14294FA-sec.asc"))
             .clientPGPPublicKey(assets.open("0xE14294FA-pub.asc"))
             .rexPayPGPPublicKey(assets.open("0xE14294FA-rex.asc"))

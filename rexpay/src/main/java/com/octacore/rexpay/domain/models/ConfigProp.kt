@@ -31,10 +31,12 @@ class ConfigProp private constructor() {
 
     private var _baseUrl: String = "https://pgs-sandbox.globalaccelerex.com/api/"
 
+    private var _isTest: Boolean = true
+
     private constructor(
+        isTest: Boolean,
         username: String?,
         password: String?,
-        baseUrl: String?,
         publicKey: ByteArray?,
         privateKey: ByteArray?,
         rexPayPubKey: ByteArray?,
@@ -49,19 +51,19 @@ class ConfigProp private constructor() {
         if (passphrase == null) throw NullPointerException("Passphrase cannot be missing")
         this._passphrase = passphrase
 
-        this._baseUrl = baseUrl ?: _baseUrl
-
         this._publicKey = publicKey
 
         this._privateKey = privateKey
 
         this._rexPayKey = rexPayPubKey
+
+        this._isTest = isTest
     }
 
     constructor(
+        isTest: Boolean,
         apiUsername: String?,
         apiPassword: String?,
-        baseUrl: String?,
         clientPGPPublicKey: File?,
         clientPGPPrivateKey: File?,
         rexPayPGPPublicKey: File?,
@@ -76,19 +78,19 @@ class ConfigProp private constructor() {
         if (pgpPassPhrase == null) throw NullPointerException("Passphrase cannot be missing")
         this._password = apiPassword
 
-        this._baseUrl = baseUrl ?: _baseUrl
-
         this._publicKey = generateKeyFromFile(clientPGPPublicKey)
 
         this._privateKey = generateKeyFromFile(clientPGPPrivateKey)
 
         this._rexPayKey = generateKeyFromFile(rexPayPGPPublicKey)
+
+        this._isTest = isTest
     }
 
     constructor(
+        isTest: Boolean,
         apiUsername: String?,
         apiPassword: String?,
-        baseUrl: String?,
         clientPGPPublicKey: String?,
         clientPGPPrivateKey: String?,
         rexPayPGPPublicKey: String?,
@@ -103,13 +105,13 @@ class ConfigProp private constructor() {
         if (pgpPassPhrase == null) throw NullPointerException("Passphrase cannot be missing")
         this._password = apiPassword
 
-        this._baseUrl = baseUrl ?: _baseUrl
-
         this._publicKey = clientPGPPublicKey?.toByteArray()
 
         this._privateKey = clientPGPPrivateKey?.toByteArray()
 
         this._rexPayKey = rexPayPGPPublicKey?.toByteArray()
+
+        this._isTest = isTest
     }
 
     internal val username: String
@@ -133,19 +135,22 @@ class ConfigProp private constructor() {
     internal val passphrase: String
         get() = _passphrase
 
+    internal val isTest: Boolean
+        get() = _isTest
+
     internal fun copy(
+        isTest: Boolean = this._isTest,
         username: String = this._username,
         password: String = this._password,
-        baseUrl: String = this._baseUrl,
         publicKey: ByteArray? = this._publicKey,
         privateKey: ByteArray? = this._privateKey,
         rexPayKey: ByteArray? = this._rexPayKey,
         passphrase: String? = this._passphrase,
     ): ConfigProp {
         return ConfigProp(
+            isTest = isTest,
             username = username,
             password = password,
-            baseUrl = baseUrl,
             publicKey = publicKey,
             privateKey = privateKey,
             rexPayPubKey = rexPayKey,
@@ -174,7 +179,8 @@ class ConfigProp private constructor() {
             if (other._rexPayKey == null) return false
             if (!_rexPayKey.contentEquals(other._rexPayKey)) return false
         } else if (other._rexPayKey != null) return false
-        return _baseUrl == other._baseUrl
+        if (_baseUrl != other._baseUrl) return false
+        return _isTest == other._isTest
     }
 
     override fun hashCode(): Int {
@@ -185,6 +191,7 @@ class ConfigProp private constructor() {
         result = 31 * result + (_privateKey?.contentHashCode() ?: 0)
         result = 31 * result + (_rexPayKey?.contentHashCode() ?: 0)
         result = 31 * result + _baseUrl.hashCode()
+        result = 31 * result + _isTest.hashCode()
         return result
     }
 
@@ -196,7 +203,8 @@ class ConfigProp private constructor() {
                 "publicKey=${publicKey.contentToString()}, " +
                 "privateKey=${privateKey.contentToString()}, " +
                 "rexPayKey=${rexPayKey.contentToString()}, " +
-                "passphrase='$passphrase'" +
+                "passphrase='$passphrase', " +
+                "isTest=$isTest" +
                 ")"
     }
 
@@ -210,10 +218,6 @@ class ConfigProp private constructor() {
         fun apiUsername(value: String) = apply { config = config.copy(username = value) }
 
         fun apiPassword(value: String) = apply { config = config.copy(password = value) }
-
-        fun baseUrl(value: String) = apply {
-            config = config.copy(baseUrl = value)
-        }
 
         fun clientPGPPublicKey(value: String) = apply {
             config = config.copy(publicKey = value.toByteArray())
@@ -246,6 +250,8 @@ class ConfigProp private constructor() {
             apply { config = config.copy(rexPayKey = genKeyFromInputStream(value)) }
 
         fun passphrase(value: String) = apply { config = config.copy(passphrase = value) }
+
+        fun isTest(value: Boolean) = apply { config = config.copy(isTest = value) }
 
         fun build(): ConfigProp = config
     }
