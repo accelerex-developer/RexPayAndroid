@@ -2,6 +2,8 @@
 
 package com.octacore.rexpay.ui
 
+import android.content.Context
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +37,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
+import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.data.cache.Cache
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.ui.theme.PoppinsFamily
 import com.octacore.rexpay.ui.theme.Red
 import com.octacore.rexpay.utils.StringUtil.formatToNaira
@@ -49,8 +55,17 @@ import com.octacore.rexpay.utils.StringUtil.formatToNaira
 @Composable
 internal fun SuccessScreen(
     navController: NavHostController,
-    amount: Long?,
+    context: Context = LocalContext.current
 ) {
+
+    val manager by lazy { PaymentManager.getInstance() }
+    val cacheResult by lazy { Cache.getInstance().transactionResult }
+
+    var amount: Long? = null
+    if (cacheResult is PayResult.Success) {
+        amount = (cacheResult as? PayResult.Success)?.amount?.toDouble()?.times(100)?.toLong() ?: 0L
+    }
+
     Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
         Card(
             modifier = Modifier
@@ -99,11 +114,14 @@ internal fun SuccessScreen(
                     modifier = Modifier.padding(top = 16.dp)
                 )
                 TextButton(
-                    onClick = {},
+                    onClick = {
+                        navController.popBackStack()
+                        manager.onResponse(context = context, cacheResult)
+                    },
                     modifier = Modifier.padding(top = 32.dp),
                     colors = ButtonDefaults.textButtonColors(contentColor = Red)
                 ) {
-                    Text(text = "Go to Dashboard", fontSize = 12.sp, fontFamily = PoppinsFamily)
+                    Text(text = "End transaction", fontSize = 12.sp, fontFamily = PoppinsFamily)
                 }
             }
         }

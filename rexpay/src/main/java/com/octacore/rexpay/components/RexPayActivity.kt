@@ -2,6 +2,8 @@
 
 package com.octacore.rexpay.components
 
+import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -34,7 +36,8 @@ internal class RexPayActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            val onBackPressedDispatcher =
+                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
             RexPayTheme {
                 Surface(
@@ -58,11 +61,13 @@ internal class RexPayActivity : ComponentActivity() {
                                     elevation = 0.dp,
                                     navigationIcon = {
                                         IconButton(onClick = {
-                                            onBackPressedDispatcher?.onBackPressed()
+                                            if (!navController.popBackStack()) {
+                                                onBackPressedDispatcher?.onBackPressed()
+                                            }
                                         }) {
                                             Icon(
                                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                                contentDescription = "Back"
+                                                contentDescription = null
                                             )
                                         }
                                     }
@@ -79,6 +84,22 @@ internal class RexPayActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(
+                Activity.OVERRIDE_TRANSITION_OPEN,
+                androidx.appcompat.R.anim.abc_fade_in,
+                androidx.appcompat.R.anim.abc_fade_out
+            )
+        } else {
+            overridePendingTransition(
+                androidx.appcompat.R.anim.abc_fade_in,
+                androidx.appcompat.R.anim.abc_fade_out
+            )
         }
     }
 }

@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.ui.banktransfer
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +53,8 @@ import com.octacore.rexpay.ui.theme.Red
 internal fun BankTransferScreen(
     navController: NavHostController,
     vm: BankTransferViewModel = viewModel(),
-    manager: PaymentManager = PaymentManager.getInstance()
+    manager: PaymentManager = PaymentManager.getInstance(),
+    context: Context = LocalContext.current
 ) {
     val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -60,7 +63,7 @@ internal fun BankTransferScreen(
         ErrorDialog(
             onClose = {
                 val err = PayResult.Error(uiState.errorMsg)
-                manager.onResponse(err)
+                manager.onResponse(context, err)
                 vm.reset()
             },
             onContinue = { },

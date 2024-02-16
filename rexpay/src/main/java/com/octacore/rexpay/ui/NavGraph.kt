@@ -70,8 +70,7 @@ internal fun AppNavGraph(
             USSDScreen(navController = navController, vm = viewModel)
         }
         composable(NavigationItem.SuccessScreen.route) { backStackEntry ->
-            val amount = backStackEntry.arguments?.getLong("amount", 0L)
-            SuccessScreen(navController = navController, amount = amount)
+            SuccessScreen(navController = navController)
         }
     }
 }

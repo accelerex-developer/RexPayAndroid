@@ -1,6 +1,7 @@
 package com.octacore.rexpay.domain.models
 
 import com.octacore.rexpay.data.BaseResult
+import com.octacore.rexpay.data.remote.models.AuthorizeCardResponse
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -12,8 +13,21 @@ import com.octacore.rexpay.data.BaseResult
 
 sealed class PayResult {
     data class Success(
-        val status: String?,
-    ) : PayResult()
+        val status: TransactionStatus,
+        val amount: String?,
+        val responseCode: String? = null,
+        val responseDescription: String? = null,
+        val paymentId: String? = null,
+        val reference: String? = null,
+    ) : PayResult() {
+        internal constructor(result: AuthorizeCardResponse?) : this(
+            status = result?.responseCode.transactionStatus(),
+            amount = result?.amount,
+            responseCode = result?.responseCode,
+            paymentId = result?.paymentId,
+            reference = result?.transactionRef,
+        )
+    }
 
     data class Error(
         val message: String,
@@ -25,5 +39,20 @@ sealed class PayResult {
             code = err?.code,
             status = err?.status
         )
+    }
+
+    enum class TransactionStatus {
+        SUCCESS,
+        PENDING,
+        FAILURE,
+        UNKNOWN
+    }
+}
+
+@JvmSynthetic
+internal fun String?.transactionStatus(): PayResult.TransactionStatus {
+    return when (this) {
+        "00" -> PayResult.TransactionStatus.SUCCESS
+        else -> PayResult.TransactionStatus.UNKNOWN
     }
 }

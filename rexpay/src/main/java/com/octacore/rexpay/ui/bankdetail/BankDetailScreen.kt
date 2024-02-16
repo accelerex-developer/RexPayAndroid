@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.ui.bankdetail
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,7 @@ internal fun BankDetailScreen(
     navController: NavHostController,
     manager: PaymentManager = PaymentManager.getInstance(),
     vm: BankDetailViewModel = viewModel(),
+    context: Context = LocalContext.current,
 ) {
     val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
@@ -80,7 +83,7 @@ internal fun BankDetailScreen(
         ErrorDialog(
             onClose = {
                 val err = PayResult.Error(uiState.errorMsg)
-                manager.onResponse(err)
+                manager.onResponse(context, err)
                 vm.reset()
             },
             onContinue = { /*TODO*/ },

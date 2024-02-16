@@ -67,13 +67,18 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
         }
     }
 
-    override fun onResult(result: PayResult) {
+    override fun onResult(result: PayResult?) {
         when (result) {
             is PayResult.Error -> {
                 Log.e("RexPay", "Transaction Failed: $result")
             }
+
             is PayResult.Success -> {
                 Log.i("RexPay", "Transaction Success: $result")
+            }
+
+            else -> {
+                Log.i("RexPay", "No result")
             }
         }
     }

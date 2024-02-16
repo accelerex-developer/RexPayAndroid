@@ -3,6 +3,7 @@
 package com.octacore.rexpay.components
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import com.octacore.rexpay.domain.models.PayResult
 
 /***************************************************************************************************
@@ -15,12 +16,12 @@ import com.octacore.rexpay.domain.models.PayResult
 internal interface PaymentManager {
     fun startActivity(context: Context)
 
-    fun onResponse(result: PayResult)
+    fun onResponse(context: Context, result: PayResult?)
 
     fun setOnResultListener(listener: Listener)
 
     interface Listener {
-        fun onResult(result: PayResult)
+        fun onResult(result: PayResult?)
     }
 
     companion object {

@@ -39,9 +39,13 @@ internal class OtpViewModel(private val repo: CardTransactionRepo) : ViewModel()
             if (response is BaseResult.Success) {
                 _uiState.update { OTPUiState(response = response.result) }
             } else if (response is BaseResult.Error) {
-                _uiState.update { OTPUiState(errorMessage = response.message) }
+                _uiState.update { OTPUiState(errorMsg = response) }
             }
         }
+    }
+
+    internal fun reset() {
+        _uiState.update { OTPUiState() }
     }
 
     internal companion object {
@@ -57,6 +61,6 @@ internal class OtpViewModel(private val repo: CardTransactionRepo) : ViewModel()
 
 internal data class OTPUiState(
     internal val isLoading: Boolean = false,
-    internal val errorMessage: String? = null,
+    internal val errorMsg: BaseResult.Error? = null,
     internal val response: AuthorizeCardResponse? = null
 )

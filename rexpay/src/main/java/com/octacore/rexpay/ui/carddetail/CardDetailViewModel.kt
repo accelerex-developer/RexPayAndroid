@@ -5,20 +5,16 @@ package com.octacore.rexpay.ui.carddetail
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.remote.models.ChargeCardResponse
-import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.CardDetail
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.utils.CreditCardFormatter
 import com.octacore.rexpay.utils.ExpiryDateFormatter
-import com.octacore.rexpay.utils.LogUtils
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -50,10 +46,21 @@ internal class CardDetailViewModel(
     internal fun initiateCardPayment() {
         _uiState.update { CardDetailUiState(isLoading = true) }
         viewModelScope.launch {
-            val payment = async { createPayment() }.await()
-            if (payment != null) {
-                val response = async { chargeCard(payment) }.await()
-                _uiState.update { CardDetailUiState(response = response) }
+            val paymentRes = baseRepo.initiatePayment()
+            if (paymentRes is BaseResult.Success) {
+                val card = CardDetail(
+                    pan = cardholder.textFieldValue.text,
+                    cvv2 = cvv,
+                    pin = pin,
+                    expiryDate = expiryDate.textFieldValue.text
+                )
+                when (val chargeRes = repo.chargeCard(card, paymentRes.result)) {
+                    is BaseResult.Error -> _uiState.update { CardDetailUiState(errorMsg = chargeRes) }
+                    is BaseResult.Success -> _uiState.update { CardDetailUiState(response = chargeRes.result) }
+                }
+            } else {
+                val error = paymentRes as? BaseResult.Error
+                _uiState.update { CardDetailUiState(errorMsg = error) }
             }
         }
     }
@@ -66,34 +73,9 @@ internal class CardDetailViewModel(
         enableButton = validCard == false && validDate == false && validCvv && validPin
     }
 
-    private suspend fun createPayment(): PaymentCreationResponse? {
-        return when (val res = baseRepo.initiatePayment()) {
-            is BaseResult.Error -> {
-                _uiState.update { CardDetailUiState(errorMsg = res) }
-                null
-            }
-
-            is BaseResult.Success -> res.result
-        }
+    internal fun reset() {
+        _uiState.update { CardDetailUiState() }
     }
-
-    private suspend fun chargeCard(payment: PaymentCreationResponse?): ChargeCardResponse? {
-        val card = CardDetail(
-            pan = cardholder.textFieldValue.text,
-            cvv2 = cvv,
-            pin = pin,
-            expiryDate = expiryDate.textFieldValue.text
-        )
-        return when (val res = repo.chargeCard(card, payment)) {
-            is BaseResult.Error -> {
-                _uiState.update { CardDetailUiState(errorMsg = res) }
-                null
-            }
-
-            is BaseResult.Success -> res.result
-        }
-    }
-
     internal companion object {
         internal fun provideFactory(
             repo: CardTransactionRepo,

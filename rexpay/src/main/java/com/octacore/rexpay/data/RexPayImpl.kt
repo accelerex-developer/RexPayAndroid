@@ -37,7 +37,7 @@ internal class RexPayImpl : RexPay, PaymentManager.Listener {
         this.listener = listener
     }
 
-    override fun onResult(result: PayResult) {
+    override fun onResult(result: PayResult?) {
         listener?.onResult(result)
     }
 }

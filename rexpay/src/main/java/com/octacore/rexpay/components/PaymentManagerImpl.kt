@@ -2,7 +2,13 @@ package com.octacore.rexpay.components
 
 import android.content.Context
 import android.content.Intent
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.Lifecycle
 import com.octacore.rexpay.domain.models.PayResult
+import com.octacore.rexpay.utils.getActivity
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -21,8 +27,9 @@ internal class PaymentManagerImpl : PaymentManager {
         context.startActivity(intent)
     }
 
-    override fun onResponse(result: PayResult) {
+    override fun onResponse(context: Context, result: PayResult?) {
         listener?.onResult(result)
+        context.getActivity()?.finishAfterTransition()
     }
 
     override fun setOnResultListener(listener: PaymentManager.Listener) {

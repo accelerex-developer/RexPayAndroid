@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.ui.otp
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -31,9 +33,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.octacore.rexpay.R
+import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.cache.Cache
+import com.octacore.rexpay.data.remote.models.AuthorizeCardResponse
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
+import com.octacore.rexpay.ui.CustomDialog
 import com.octacore.rexpay.ui.NavigationItem
 import com.octacore.rexpay.ui.theme.Red
 import com.octacore.rexpay.ui.theme.lineGray
@@ -52,17 +65,45 @@ import com.octacore.rexpay.ui.theme.textGray
 internal fun OtpScreen(
     navController: NavHostController,
     vm: OtpViewModel = viewModel(),
+    context: Context = LocalContext.current,
+    cache: Cache = Cache.getInstance(),
+    manager: PaymentManager = PaymentManager.getInstance()
 ) {
-    val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
 
-    if (uiState.response != null) {
+    fun goBack(res: AuthorizeCardResponse? = null) {
         val start = navController.graph.startDestinationId
-        val options = NavOptions.Builder()
-            .setPopUpTo(start, true)
-            .setLaunchSingleTop(true)
-            .build()
-        navController.navigate(NavigationItem.SuccessScreen.route, options)
+        navController.popBackStack(start, true)
+        val error =
+            res?.let { BaseResult.Error(message = "An error occurred", code = it.responseCode) }
+                ?: uiState.errorMsg
+        val result = PayResult.Error(error)
+        manager.onResponse(context, result)
+    }
+
+    if (uiState.response != null) {
+        if (uiState.response?.responseCode == "00") {
+            val start = navController.graph.startDestinationId
+            val options = NavOptions.Builder()
+                .setPopUpTo(start, true)
+                .setLaunchSingleTop(true)
+                .build()
+            navController.navigate(NavigationItem.SuccessScreen.route, options)
+        } else {
+            ErrorDialog(
+                onClose = { goBack(uiState.response) },
+                onContinue = { vm.reset() },
+                message = "An error occurred"
+            )
+        }
+    }
+
+    if (uiState.errorMsg != null) {
+        ErrorDialog(
+            onClose = { goBack() },
+            onContinue = { vm.reset() },
+            message = uiState.errorMsg?.message ?: "An error occurred"
+        )
     }
 
     Column(verticalArrangement = Arrangement.Center) {
@@ -123,5 +164,43 @@ internal fun OtpScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ErrorDialog(
+    onClose: () -> Unit,
+    onContinue: () -> Unit,
+    message: String,
+) {
+    CustomDialog(
+        positiveText = "Retry",
+        negativeText = "Cancel",
+        horizontalAlignment = Alignment.CenterHorizontally,
+        onDismissRequest = { },
+        onPositiveClicked = onContinue,
+        onNegativeClicked = onClose
+    ) {
+        val composition by rememberLottieComposition(
+            LottieCompositionSpec
+                .RawRes(R.raw.error_anim)
+        )
+        val progress by animateLottieCompositionAsState(
+            composition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = true,
+            restartOnPlay = false
+        )
+        LottieAnimation(
+            composition,
+            { progress },
+            modifier = Modifier.size(120.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = message,
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp,
+        )
     }
 }

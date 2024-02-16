@@ -2,6 +2,7 @@
 
 package com.octacore.rexpay.ui.carddetail
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,15 +24,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -52,7 +51,10 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.octacore.rexpay.R
+import com.octacore.rexpay.components.PaymentManager
+import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.cache.Cache
+import com.octacore.rexpay.data.remote.models.ChargeCardResponse
 import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.ui.BaseBox
 import com.octacore.rexpay.ui.BaseTopNav
@@ -75,38 +77,51 @@ import com.octacore.rexpay.ui.theme.textGray
 internal fun CardDetailScreen(
     navController: NavHostController,
     vm: CardDetailViewModel = viewModel(),
+    context: Context = LocalContext.current,
+    cache: Cache = Cache.getInstance(),
+    manager: PaymentManager = PaymentManager.getInstance()
 ) {
-    val cache by lazy { Cache.getInstance() }
     val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+    val keyboardManager = LocalSoftwareKeyboardController.current
+
+    fun goBack(res: ChargeCardResponse? = null) {
+        val start = navController.graph.startDestinationId
+        navController.popBackStack(start, true)
+        val error = res?.let {
+            BaseResult.Error(
+                message = it.responseDescription ?: "Transaction could not be completed",
+                code = it.responseCode
+            )
+        } ?: uiState.errorMsg
+        val result = PayResult.Error(error)
+        manager.onResponse(context, result)
+    }
 
     val res = uiState.response
     if (res != null) {
-        if (res.responseCode == "T0") {
-            val options = NavOptions.Builder()
-                .setLaunchSingleTop(true)
-                .build()
-            navController.navigate(NavigationItem.OTPScreen.route, options)
-        } else if (res.responseCode == "01") {
-            ErrorDialog(
-                onClose = {
-//                    val err = PayResult.Error(uiState.errorMsg)
-//                    manager.onResponse(err)
-//                    vm.reset()
-                },
-                onContinue = { },
-                message = res.responseDescription ?: "Something went wrong"
-            )
+        when (res.responseCode) {
+            "T0" -> {
+                val options = NavOptions.Builder()
+                    .setLaunchSingleTop(true)
+                    .build()
+                navController.navigate(NavigationItem.OTPScreen.route, options)
+            }
+
+            else -> {
+                ErrorDialog(
+                    onClose = { goBack(res) },
+                    onContinue = { vm.reset() },
+                    message = res.responseDescription ?: "Transaction could not be completed"
+                )
+            }
         }
     }
 
     if (uiState.errorMsg != null) {
         ErrorDialog(
-            onClose = {
-//                    val err = PayResult.Error(uiState.errorMsg)
-//                    manager.onResponse(err)
-//                    vm.reset()
-            },
-            onContinue = { },
+            onClose = { goBack() },
+            onContinue = { vm.reset() },
             message = uiState.errorMsg?.message ?: "Something went wrong"
         )
     }
@@ -141,6 +156,9 @@ internal fun CardDetailScreen(
                 ) {
                     vm.cardholder.formatCreditCard(it)
                     vm.checkValues()
+                    if (vm.cardholder.isInvalid == false) {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }
                 }
                 Row(
                     modifier = Modifier.padding(top = 16.dp)
@@ -160,6 +178,9 @@ internal fun CardDetailScreen(
                     ) {
                         vm.expiryDate.formatExpiryDate(it)
                         vm.checkValues()
+                        if (vm.expiryDate.isInvalid == false) {
+                            focusManager.moveFocus(FocusDirection.Next)
+                        }
                     }
                     TextOutlineForm(
                         modifier = Modifier
@@ -175,6 +196,9 @@ internal fun CardDetailScreen(
                     ) {
                         if (it.length in 0..3) vm.cvv = it
                         vm.checkValues()
+                        if (it.length == 3) {
+                            focusManager.moveFocus(FocusDirection.Next)
+                        }
                     }
                 }
                 TextOutlineForm(
@@ -202,7 +226,10 @@ internal fun CardDetailScreen(
                         .fillMaxWidth()
                         .padding(top = 24.dp),
                     enabled = !uiState.isLoading && vm.enableButton,
-                    onClick = { vm.initiateCardPayment() },
+                    onClick = {
+                        keyboardManager?.hide()
+                        vm.initiateCardPayment()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Red,
                         contentColor = Color.White

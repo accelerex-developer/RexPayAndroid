@@ -16,6 +16,7 @@ import com.octacore.rexpay.data.remote.models.KeyRequest
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.CardDetail
 import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.utils.CryptoUtils
 import com.octacore.rexpay.utils.LogUtils
@@ -91,16 +92,17 @@ internal class CardTransactionRepoImpl(
                 null
             }
             val res = processRequest { service.authorizeTransaction(EncryptedRequest(data)) }
+            cache.hasSession = true
             if (res is BaseResult.Success) {
                 val response = res.result
                 val decryptedString =
                     crypto.decrypt(response?.encryptedResponse, config.passphrase, clientSecKeyRing)
-                return@withContext BaseResult.Success(
-                    Gson().fromJson(
-                        decryptedString,
-                        AuthorizeCardResponse::class.java
-                    )
+                val cardResponse = Gson().fromJson(
+                    decryptedString,
+                    AuthorizeCardResponse::class.java
                 )
+                cache.transactionResult = PayResult.Success(cardResponse)
+                return@withContext BaseResult.Success(cardResponse)
             }
             val error = res as BaseResult.Error
             return@withContext BaseResult.Error(error.message)
@@ -123,6 +125,7 @@ internal class CardTransactionRepoImpl(
             null
         }
         val response = processRequest { service.chargeCard(EncryptedRequest(data)) }
+        cache.hasSession = true
         if (response is BaseResult.Success) {
             val decrypted = crypto.decrypt(
                 response.result?.encryptedResponse,

@@ -41,7 +41,7 @@ internal fun CustomDialog(
     negativeText: String? = null,
     onDismissRequest: () -> Unit,
     onPositiveClicked: () -> Unit,
-    onNegativeClicked: () -> Unit,
+    onNegativeClicked: () -> @Composable Unit,
     properties: DialogProperties = DialogProperties(),
     content: @Composable ColumnScope.() -> Unit,
 ) {

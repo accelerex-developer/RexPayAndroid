@@ -44,6 +44,6 @@ interface RexPay {
     }
 
     interface RexPayListener {
-        fun onResult(result: PayResult)
+        fun onResult(result: PayResult?)
     }
 }
