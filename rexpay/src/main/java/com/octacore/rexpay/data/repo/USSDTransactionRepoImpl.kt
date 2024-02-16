@@ -10,6 +10,7 @@ import com.octacore.rexpay.data.remote.models.ChargeUssdRequest
 import com.octacore.rexpay.data.remote.models.ChargeUssdResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.UssdPaymentDetailResponse
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.models.USSDBank
 import com.octacore.rexpay.domain.repo.USSDTransactionRepo
 import com.octacore.rexpay.utils.LogUtils
@@ -54,6 +55,7 @@ internal class USSDTransactionRepoImpl(
         return processRequest { service.fetchUssdPaymentDetail(reference ?: "") }.also {
             if (it is BaseResult.Success) {
                 cache.hasSession = true
+                cache.transactionResult = PayResult.Success(it.result)
             }
         }
     }

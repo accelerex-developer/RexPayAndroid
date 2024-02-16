@@ -11,6 +11,7 @@ import com.octacore.rexpay.data.remote.models.TransactionStatusRequest
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.domain.models.BankAccount
 import com.octacore.rexpay.data.BaseResult
+import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
 
 /***************************************************************************************************
@@ -20,7 +21,8 @@ import com.octacore.rexpay.domain.repo.BankTransactionRepo
  * Author          : Gideon Chukwu
  * Date            : 31/01/2024
  **************************************************************************************************/
-internal class BankTransactionRepoImpl(private val service: PaymentService) : BankTransactionRepo, BaseRepo() {
+internal class BankTransactionRepoImpl(private val service: PaymentService) : BankTransactionRepo,
+    BaseRepo() {
 
     private val cache = Cache.getInstance()
 
@@ -36,6 +38,10 @@ internal class BankTransactionRepoImpl(private val service: PaymentService) : Ba
 
     override suspend fun checkTransactionStatus(reference: String?): BaseResult<TransactionStatusResponse?> {
         val request = TransactionStatusRequest(reference)
-        return processRequest { service.fetchTransactionStatus(request) }
+        return processRequest { service.fetchTransactionStatus(request) }.also {
+            if (it is BaseResult.Success) {
+                cache.transactionResult = PayResult.Success(it.result)
+            }
+        }
     }
 }
