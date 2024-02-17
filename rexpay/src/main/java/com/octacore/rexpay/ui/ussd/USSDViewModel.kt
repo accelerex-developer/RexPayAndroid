@@ -104,17 +104,25 @@ internal class USSDViewModel(
                 _chargeUssdState.update { it.copy(isLoading = false) }
             }
         } else {
-            initPayment()
-            return chargeUSSD(bank)
+            return when (val res = initPayment()) {
+                is BaseResult.Error -> {
+                    _chargeUssdState.update { ChargeUSSDState(errorMsg = res) }
+                    return false
+                }
+                is BaseResult.Success -> chargeUSSD(bank)
+            }
         }
     }
 
-    private suspend fun initPayment() {
+    private suspend fun initPayment(): BaseResult<PaymentCreationResponse?> {
         _networkJob?.join()
         _chargeUssdState.update { it.copy(isLoading = true) }
-        when (val paymentRes = baseRepo.initiatePayment()) {
-            is BaseResult.Error -> _chargeUssdState.update { ChargeUSSDState(errorMsg = paymentRes) }
-            is BaseResult.Success -> _paymentCreationRes.value = paymentRes.result
+        return when (val paymentRes = baseRepo.initiatePayment()) {
+            is BaseResult.Error -> paymentRes
+            is BaseResult.Success -> {
+                _paymentCreationRes.value = paymentRes.result
+                return paymentRes
+            }
         }
     }
 

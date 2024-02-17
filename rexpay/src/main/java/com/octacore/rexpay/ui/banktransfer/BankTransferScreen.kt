@@ -66,7 +66,7 @@ internal fun BankTransferScreen(
                 manager.onResponse(context, err)
                 vm.reset()
             },
-            onContinue = { },
+            onContinue = { vm.reset() },
             message = uiState.errorMsg?.message ?: "Something went wrong"
         )
     }

@@ -2,7 +2,6 @@
 
 package com.octacore.rexpay.data.remote
 
-import android.content.Context
 import com.google.gson.GsonBuilder
 import com.octacore.rexpay.data.remote.models.ChargeBankRequest
 import com.octacore.rexpay.data.remote.models.ChargeBankResponse
@@ -16,10 +15,9 @@ import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.remote.models.TransactionStatusRequest
 import com.octacore.rexpay.data.remote.models.TransactionStatusResponse
 import com.octacore.rexpay.data.remote.models.UssdPaymentDetailResponse
-import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.Config
 import com.octacore.rexpay.utils.AuthInterceptor
 import com.octacore.rexpay.utils.LogUtils
-import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -28,10 +26,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 /***************************************************************************************************
@@ -42,31 +38,30 @@ import java.util.concurrent.TimeUnit
  * Date            : 27/01/2024
  **************************************************************************************************/
 internal interface PaymentService {
-    @POST("pgs/payment/v2/createPayment")
+    @POST("/api/pgs/payment/v2/createPayment")
     suspend fun createPayment(@Body request: PaymentCreationRequest): Response<PaymentCreationResponse?>
 
-    @POST("cps/v1/chargeCard")
-//    @Headers("Content-Type: text/plain")
+    @POST("/api/cps/v1/chargeCard")
     suspend fun chargeCard(@Body request: EncryptedRequest): Response<EncryptedResponse?>
 
-    @POST("cps/v1/authorizeTransaction")
+    @POST("/api/cps/v1/authorizeTransaction")
     suspend fun authorizeTransaction(@Body request: EncryptedRequest): Response<EncryptedResponse?>
 
-    @POST("cps/v1/initiateBankTransfer")
+    @POST("/api/cps/v1/initiateBankTransfer")
     suspend fun chargeBank(@Body request: ChargeBankRequest): Response<ChargeBankResponse?>
 
-    @POST("cps/v1/getTransactionStatus")
+    @POST("/api/cps/v1/getTransactionStatus")
     suspend fun fetchTransactionStatus(@Body request: TransactionStatusRequest): Response<TransactionStatusResponse?>
 
-    @POST("pgs/payment/v1/makePayment")
+    @POST("/api/pgs/payment/v1/makePayment")
     suspend fun chargeUssd(@Body request: ChargeUssdRequest): Response<ChargeUssdResponse?>
 
-    @GET("pgs/payment/v1/getPaymentDetails/{trans}")
+    @GET("/api/pgs/payment/v1/getPaymentDetails/{trans}")
     suspend fun fetchUssdPaymentDetail(
         @Path("trans") reference: String,
     ): Response<UssdPaymentDetailResponse?>
 
-    @POST("pgs/clients/v1/publicKey")
+    @POST("/api/pgs/clients/v1/publicKey")
     suspend fun insertPublicKey(@Body request: KeyRequest): Response<Void?>
 
     companion object {
@@ -74,7 +69,7 @@ internal interface PaymentService {
         private var INSTANCE: PaymentService? = null
 
         @JvmStatic
-        fun getInstance(config: ConfigProp): PaymentService {
+        fun getInstance(config: Config): PaymentService {
             return INSTANCE ?: synchronized(this) {
                 val logInterceptor = HttpLoggingInterceptor()
                 if (LogUtils.showLog) {
@@ -87,6 +82,7 @@ internal interface PaymentService {
                     .readTimeout(2, TimeUnit.MINUTES)
                     .writeTimeout(2, TimeUnit.MINUTES)
                     .connectTimeout(2, TimeUnit.MINUTES)
+                    .addInterceptor(HostInterceptor(config))
                     .addInterceptor(AuthInterceptor(config))
                     .addInterceptor(logInterceptor)
                     .build()

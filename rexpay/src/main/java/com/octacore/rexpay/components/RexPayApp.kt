@@ -5,7 +5,7 @@ package com.octacore.rexpay.components
 import android.app.Application
 import android.content.Context
 import com.octacore.rexpay.data.remote.PaymentService
-import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.Config
 import com.octacore.rexpay.domain.repo.BankTransactionRepo
 import com.octacore.rexpay.domain.repo.BasePaymentRepo
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
@@ -29,7 +29,7 @@ internal object RexPayApp {
     private var _bankRepo: BankTransactionRepo? = null
 
     @JvmStatic
-    internal fun init(context: Context, config: ConfigProp) {
+    internal fun init(context: Context, config: Config) {
         val app = context.applicationContext as Application
 
         val service = PaymentService.getInstance(config)

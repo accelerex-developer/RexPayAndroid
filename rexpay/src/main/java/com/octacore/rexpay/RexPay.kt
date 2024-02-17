@@ -3,7 +3,7 @@ package com.octacore.rexpay
 import android.content.Context
 import com.octacore.rexpay.components.RexPayApp
 import com.octacore.rexpay.data.RexPayImpl
-import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.Config
 import com.octacore.rexpay.domain.models.Charge
 import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.utils.LogUtils
@@ -27,7 +27,7 @@ interface RexPay {
         @JvmStatic
         fun init(
             context: Context,
-            configProp: ConfigProp,
+            configProp: Config,
             showLog: Boolean = BuildConfig.DEBUG
         ) {
             LogUtils.init(showLog = showLog)

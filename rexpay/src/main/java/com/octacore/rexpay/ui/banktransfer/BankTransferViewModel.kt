@@ -34,29 +34,15 @@ internal class BankTransferViewModel(
     internal fun initiate() {
         _uiState.update { BankTransferState(isLoading = true) }
         viewModelScope.launch {
-            val payment = async { createPayment() }.await()
-            val detail = async { chargeBank(payment) }.await()
-            _uiState.update { it.copy(account = detail) }
-        }
-    }
-
-    private suspend fun createPayment(): PaymentCreationResponse? {
-        return when (val res = baseRepo.initiatePayment()) {
-            is BaseResult.Error -> {
-                _uiState.update { it.copy(errorMsg = res) }
-                null
+            when (val payRes = baseRepo.initiatePayment()) {
+                is BaseResult.Error -> _uiState.update { BankTransferState(errorMsg = payRes) }
+                is BaseResult.Success -> {
+                    when (val res = repo.initiateBankTransfer(payRes.result)) {
+                        is BaseResult.Error -> _uiState.update { BankTransferState(errorMsg = res) }
+                        is BaseResult.Success -> _uiState.update { BankTransferState(account = res.result) }
+                    }
+                }
             }
-            is BaseResult.Success -> res.result
-        }
-    }
-
-    private suspend fun chargeBank(payment: PaymentCreationResponse?): ChargeBankResponse? {
-        return when (val res = repo.initiateBankTransfer(payment)) {
-            is BaseResult.Error -> {
-                _uiState.update { it.copy(errorMsg = res) }
-                null
-            }
-            is BaseResult.Success -> res.result
         }
     }
 

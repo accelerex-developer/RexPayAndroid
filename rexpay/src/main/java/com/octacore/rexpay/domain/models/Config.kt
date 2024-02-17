@@ -15,7 +15,7 @@ import java.io.InputStream
  * Author          : Gideon Chukwu
  * Date            : 01/02/2024
  **************************************************************************************************/
-class ConfigProp private constructor() {
+class Config private constructor() {
 
     private var _username: String = ""
 
@@ -29,7 +29,7 @@ class ConfigProp private constructor() {
 
     private var _rexPayKey: ByteArray? = null
 
-    private var _baseUrl: String = "https://pgs-sandbox.globalaccelerex.com/api/"
+    private var _baseUrl: String = "https://pgs-sandbox.globalaccelerex.com"
 
     private var _isTest: Boolean = true
 
@@ -146,8 +146,8 @@ class ConfigProp private constructor() {
         privateKey: ByteArray? = this._privateKey,
         rexPayKey: ByteArray? = this._rexPayKey,
         passphrase: String? = this._passphrase,
-    ): ConfigProp {
-        return ConfigProp(
+    ): Config {
+        return Config(
             isTest = isTest,
             username = username,
             password = password,
@@ -162,7 +162,7 @@ class ConfigProp private constructor() {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as ConfigProp
+        other as Config
 
         if (_username != other._username) return false
         if (_password != other._password) return false
@@ -209,7 +209,7 @@ class ConfigProp private constructor() {
     }
 
     class Builder(context: Context) {
-        private var config: ConfigProp = ConfigProp()
+        private var config: Config = Config()
 
         init {
             InputOutputUtils.clearCache(context)
@@ -253,7 +253,7 @@ class ConfigProp private constructor() {
 
         fun isTest(value: Boolean) = apply { config = config.copy(isTest = value) }
 
-        fun build(): ConfigProp = config
+        fun build(): Config = config
     }
 
 

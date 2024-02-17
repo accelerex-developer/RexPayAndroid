@@ -13,15 +13,14 @@ import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import com.example.rexpay.ui.theme.RexAppTheme
 import com.octacore.rexpay.RexPay
-import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.Config
 import com.octacore.rexpay.domain.models.Charge
 import com.octacore.rexpay.domain.models.PayResult
-import java.util.UUID
 
 class MainActivity : ComponentActivity(), RexPay.RexPayListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val config = ConfigProp.Builder(this)
+        val config = Config.Builder(this)
             .apiUsername("talk2phasahsyyahoocom")
             .apiPassword("f0bedbea93df09264a4f09a6b38de6e9b924b6cb92bf4a0c07ce46f26f85")
             .isTest(false)
@@ -54,15 +53,6 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
                                 email = "random.user@email.com",
                                 customerName = "Random User"
                             )
-                            rexPay.setPaymentListener(object : RexPay.RexPayListener{
-                                override fun onResult(result: PayResult?) {
-                                    when(result) {
-                                        is PayResult.Error -> TODO()
-                                        is PayResult.Success -> TODO()
-                                        null -> TODO()
-                                    }
-                                }
-                            })
                             rexPay.makePayment(this@MainActivity, charge)
                         }
                     ) {

@@ -1,6 +1,6 @@
 # :credit_card: Rexpay Plugin for Android
 
-![Screenshot of My App](screenshots/screenshot_1.png)
+<img src="screenshots/screenshot_1.png" width="200px" height="auto" hspace="20" alt="Screenshot of My App"/>
 
 Android SDK to process RexPay payment.
 

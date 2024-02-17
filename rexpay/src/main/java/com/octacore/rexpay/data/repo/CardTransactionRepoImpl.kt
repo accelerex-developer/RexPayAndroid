@@ -15,7 +15,7 @@ import com.octacore.rexpay.data.remote.models.EncryptedRequest
 import com.octacore.rexpay.data.remote.models.KeyRequest
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.domain.models.CardDetail
-import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.Config
 import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.domain.repo.CardTransactionRepo
 import com.octacore.rexpay.utils.CryptoUtils
@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
  **************************************************************************************************/
 internal class CardTransactionRepoImpl(
     private val service: PaymentService,
-    private val config: ConfigProp,
+    private val config: Config,
 ) : CardTransactionRepo, BaseRepo() {
 
     private val cache by lazy { Cache.getInstance() }

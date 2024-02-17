@@ -2,7 +2,6 @@
 
 package com.octacore.rexpay.domain.repo
 
-import android.content.Context
 import com.octacore.rexpay.data.BaseResult
 import com.octacore.rexpay.data.remote.PaymentService
 import com.octacore.rexpay.data.remote.models.AuthorizeCardResponse
@@ -10,7 +9,7 @@ import com.octacore.rexpay.data.remote.models.ChargeCardResponse
 import com.octacore.rexpay.data.remote.models.PaymentCreationResponse
 import com.octacore.rexpay.data.repo.CardTransactionRepoImpl
 import com.octacore.rexpay.domain.models.CardDetail
-import com.octacore.rexpay.domain.models.ConfigProp
+import com.octacore.rexpay.domain.models.Config
 
 /***************************************************************************************************
  *                          Copyright (C) 2024,  Octacore Tech.
@@ -37,7 +36,7 @@ internal interface CardTransactionRepo {
         @JvmStatic
         fun getInstance(
             service: PaymentService,
-            config: ConfigProp,
+            config: Config,
         ): CardTransactionRepo {
             return INSTANCE ?: synchronized(this) {
                 val instance = CardTransactionRepoImpl(service, config)
