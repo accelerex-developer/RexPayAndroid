@@ -10,8 +10,7 @@ package com.octacore.rexpay.domain.models
  * Date            : 27/01/2024
  **************************************************************************************************/
 
-class PayPayload private constructor() {
-    private var _reference: String = ""
+class Charge private constructor() {
     private var _amount: Long = 0L
     private var _currency: String = "NGN"
     private var _userId: String = ""
@@ -23,14 +22,11 @@ class PayPayload private constructor() {
     constructor(
         userId: String?,
         email: String?,
-        reference: String?,
         amount: Long?,
         customerName: String?,
         currency: String? = null,
         callbackUrl: String? = null,
     ) : this() {
-        if (reference.isNullOrEmpty()) throw NullPointerException("Reference cannot be null or empty")
-        _reference = reference
 
         if (amount == null) throw NullPointerException("Amount cannot be null")
         if (amount <= 0) throw IllegalArgumentException("Amount entered is not valid")
@@ -48,9 +44,6 @@ class PayPayload private constructor() {
         _currency = currency ?: _currency
         _callbackUrl = callbackUrl ?: _callbackUrl
     }
-
-    val reference: String
-        get() = _reference
 
     val amount: Long
         get() = _amount
@@ -81,16 +74,14 @@ class PayPayload private constructor() {
         }
 
     fun copy(
-        reference: String? = this._reference,
         amount: Long? = this._amount,
         currency: String? = this._currency,
         userId: String? = this._userId,
         callbackUrl: String? = this._callbackUrl,
         email: String? = this._email,
         customerName: String? = this._customerName
-    ): PayPayload {
-        return PayPayload(
-            reference = reference,
+    ): Charge {
+        return Charge(
             amount = amount,
             currency = currency,
             userId = userId,
@@ -102,7 +93,6 @@ class PayPayload private constructor() {
 
     override fun toString(): String {
         return "PayPayload(" +
-                "reference='$_reference', " +
                 "amount=$_amount, " +
                 "currency='$_currency', " +
                 "userId='$_userId', " +
@@ -116,9 +106,8 @@ class PayPayload private constructor() {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as PayPayload
+        other as Charge
 
-        if (_reference != other._reference) return false
         if (_amount != other._amount) return false
         if (_currency != other._currency) return false
         if (_userId != other._userId) return false
@@ -128,8 +117,7 @@ class PayPayload private constructor() {
     }
 
     override fun hashCode(): Int {
-        var result = _reference.hashCode()
-        result = 31 * result + _amount.hashCode()
+        var result = _amount.hashCode()
         result = 31 * result + _currency.hashCode()
         result = 31 * result + _userId.hashCode()
         result = 31 * result + _callbackUrl.hashCode()
@@ -139,13 +127,7 @@ class PayPayload private constructor() {
     }
 
     class Builder {
-        private var payload = PayPayload()
-
-        @Throws(NullPointerException::class)
-        fun reference(value: String?) = apply {
-            if (value.isNullOrEmpty()) throw NullPointerException("Reference cannot be null or empty")
-            payload = payload.copy(reference = value)
-        }
+        private var payload = Charge()
 
         @Throws(NullPointerException::class, IllegalArgumentException::class)
         fun amount(value: Long?) = apply {
@@ -176,6 +158,6 @@ class PayPayload private constructor() {
             payload = payload.copy(customerName = value)
         }
 
-        fun build(): PayPayload = payload
+        fun build(): Charge = payload
     }
 }

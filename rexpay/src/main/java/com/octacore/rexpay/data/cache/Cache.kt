@@ -3,7 +3,7 @@
 package com.octacore.rexpay.data.cache
 
 import com.octacore.rexpay.domain.models.BankAccount
-import com.octacore.rexpay.domain.models.PayPayload
+import com.octacore.rexpay.domain.models.Charge
 import com.octacore.rexpay.domain.models.PayResult
 
 /***************************************************************************************************
@@ -19,7 +19,7 @@ internal interface Cache {
 
     var hasSession: Boolean?
 
-    var payload: PayPayload?
+    var payload: Charge?
 
     var ussdCode: String?
 

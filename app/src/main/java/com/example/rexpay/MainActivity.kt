@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import com.example.rexpay.ui.theme.RexAppTheme
 import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.domain.models.ConfigProp
-import com.octacore.rexpay.domain.models.PayPayload
+import com.octacore.rexpay.domain.models.Charge
 import com.octacore.rexpay.domain.models.PayResult
 import java.util.UUID
 
@@ -46,9 +46,7 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
                     Button(
                         modifier = Modifier.wrapContentSize(),
                         onClick = {
-                            val payload = PayPayload(
-                                reference = UUID.randomUUID().toString()
-                                    .replace(Regex("\\W"), ""),
+                            val charge = Charge(
                                 amount = 100,
                                 currency = "NGN",
                                 userId = "random.user@email.com",
@@ -56,7 +54,16 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
                                 email = "random.user@email.com",
                                 customerName = "Random User"
                             )
-                            rexPay.makePayment(this@MainActivity, payload)
+                            rexPay.setPaymentListener(object : RexPay.RexPayListener{
+                                override fun onResult(result: PayResult?) {
+                                    when(result) {
+                                        is PayResult.Error -> TODO()
+                                        is PayResult.Success -> TODO()
+                                        null -> TODO()
+                                    }
+                                }
+                            })
+                            rexPay.makePayment(this@MainActivity, charge)
                         }
                     ) {
                         Text(text = "PAY")

@@ -6,7 +6,7 @@ import android.content.Context
 import com.octacore.rexpay.RexPay
 import com.octacore.rexpay.components.PaymentManager
 import com.octacore.rexpay.data.cache.Cache
-import com.octacore.rexpay.domain.models.PayPayload
+import com.octacore.rexpay.domain.models.Charge
 import com.octacore.rexpay.domain.models.PayResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ internal class RexPayImpl : RexPay, PaymentManager.Listener {
 
     private var listener: RexPay.RexPayListener? = null
 
-    override fun makePayment(context: Context, payload: PayPayload) {
+    override fun makePayment(context: Context, payload: Charge) {
         val cache = Cache.getInstance()
         cache.payload = payload
         CoroutineScope(Dispatchers.Main).launch {

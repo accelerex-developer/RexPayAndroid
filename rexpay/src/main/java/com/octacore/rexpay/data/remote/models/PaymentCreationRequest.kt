@@ -3,7 +3,7 @@
 package com.octacore.rexpay.data.remote.models
 
 import com.google.gson.annotations.SerializedName
-import com.octacore.rexpay.domain.models.PayPayload
+import com.octacore.rexpay.domain.models.Charge
 import java.util.UUID
 
 /***************************************************************************************************
@@ -27,7 +27,7 @@ internal data class PaymentCreationRequest(
         internal val customerName: String?,
     )
 
-    constructor(payload: PayPayload?) : this(
+    constructor(payload: Charge?) : this(
         reference = UUID.randomUUID().toString().replace(Regex("\\W"), ""),
         amount = payload?.amount,
         currency = payload?.currency,

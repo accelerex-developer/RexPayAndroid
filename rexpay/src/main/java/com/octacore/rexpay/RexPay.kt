@@ -4,7 +4,7 @@ import android.content.Context
 import com.octacore.rexpay.components.RexPayApp
 import com.octacore.rexpay.data.RexPayImpl
 import com.octacore.rexpay.domain.models.ConfigProp
-import com.octacore.rexpay.domain.models.PayPayload
+import com.octacore.rexpay.domain.models.Charge
 import com.octacore.rexpay.domain.models.PayResult
 import com.octacore.rexpay.utils.LogUtils
 
@@ -17,7 +17,7 @@ import com.octacore.rexpay.utils.LogUtils
  **************************************************************************************************/
 interface RexPay {
 
-    fun makePayment(context: Context, payload: PayPayload)
+    fun makePayment(context: Context, payload: Charge)
 
     fun setPaymentListener(listener: RexPayListener)
 
