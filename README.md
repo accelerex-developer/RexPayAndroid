@@ -41,16 +41,16 @@ val config = ConfigProp.Builder(this)
     .build()
 ```
 
-3. Supplying the Encryption keys as a string value.
+3. Supplying the Encryption keys as a File.
 
 ```kotlin
 val config = ConfigProp.Builder(this)
     .apiUsername("Authorization Username")
     .apiPassword("Authorization Password")
     .isTest(true)
-    .clientPGPPrivateKey("client secret key file")
-    .clientPGPPublicKey("client public key file")
-    .rexPayPGPPublicKey("RexPay public key file")
+    .clientPGPPrivateKey(File("client secret key file path"))
+    .clientPGPPublicKey(File("client public key file path"))
+    .rexPayPGPPublicKey(File("RexPay public key file path"))
     .passphrase("Encryption Passphrase")
     .build()
 ```
