@@ -4,24 +4,12 @@ plugins {
     alias(libs.plugins.android.kotlin.ksp)
 }
 
-fun getCredProps() {
-    val vPropsFile = rootProject.file("./config/rexpay.asc")
-
-    if (vPropsFile.exists() || vPropsFile.canRead()) {
-        val output = rootProject.file("./rexpay/src/main/assets/rexpay.asc")
-        vPropsFile.copyTo(output, true)
-    } else {
-        throw GradleException("Could not find rexpay.asc")
-    }
-}
-
 android {
     namespace = "com.octacore.rexpay"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-        getCredProps()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -83,11 +71,6 @@ dependencies {
     implementation(libs.google.gson)
     implementation(libs.bouncycastle.bcpg)
     implementation(libs.bouncycastle.bcprov)
-//    implementation(project(":pgplibs"))
-//    implementation(libs.madgag.spongycastle.core)
-//    implementation(libs.madgag.spongycastle.prov)
-//    implementation(libs.madgag.spongycastle.pkix)
-//    implementation(libs.madgag.spongycastle.pg)
 
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.ext.junit)

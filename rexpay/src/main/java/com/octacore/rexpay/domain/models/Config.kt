@@ -208,12 +208,8 @@ class Config private constructor() {
                 ")"
     }
 
-    class Builder(context: Context) {
+    class Builder {
         private var config: Config = Config()
-
-        init {
-            InputOutputUtils.clearCache(context)
-        }
 
         fun apiUsername(value: String) = apply { config = config.copy(username = value) }
 

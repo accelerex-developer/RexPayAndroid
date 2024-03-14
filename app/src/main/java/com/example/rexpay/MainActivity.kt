@@ -20,10 +20,10 @@ import com.octacore.rexpay.domain.models.PayResult
 class MainActivity : ComponentActivity(), RexPay.RexPayListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val config = Config.Builder(this)
+        val config = Config.Builder()
             .apiUsername("talk2phasahsyyahoocom")
             .apiPassword("f0bedbea93df09264a4f09a6b38de6e9b924b6cb92bf4a0c07ce46f26f85")
-            .isTest(false)
+            .isTest(true)
             .clientPGPPrivateKey(assets.open("0xE14294FA-sec.asc"))
             .clientPGPPublicKey(assets.open("0xE14294FA-pub.asc"))
             .rexPayPGPPublicKey(assets.open("0xE14294FA-rex.asc"))
