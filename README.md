@@ -11,6 +11,9 @@ More information will be out soon on this.
 ## :rocket: Initializing the SDK
 
 Create your config class.
+The config object can be created in the three following ways:
+
+1. Supplying the Encryption keys from a FileInputStream.
 
 ```kotlin
 val config = ConfigProp.Builder(this)
@@ -24,7 +27,7 @@ val config = ConfigProp.Builder(this)
     .build()
 ```
 
-You can also create your config with:
+2. Supplying the Encryption keys as a string value.
 
 ```kotlin
 val config = ConfigProp.Builder(this)
@@ -38,7 +41,7 @@ val config = ConfigProp.Builder(this)
     .build()
 ```
 
-You can also create your config with:
+3. Supplying the Encryption keys as a string value.
 
 ```kotlin
 val config = ConfigProp.Builder(this)
