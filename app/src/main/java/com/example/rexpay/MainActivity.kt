@@ -12,10 +12,10 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import com.example.rexpay.ui.theme.RexAppTheme
-import com.octacore.rexpay.RexPay
-import com.octacore.rexpay.domain.models.Config
-import com.octacore.rexpay.domain.models.Charge
-import com.octacore.rexpay.domain.models.PayResult
+import com.globalaccelerex.rexpay.RexPay
+import com.globalaccelerex.rexpay.domain.models.Config
+import com.globalaccelerex.rexpay.domain.models.Charge
+import com.globalaccelerex.rexpay.domain.models.PayResult
 
 class MainActivity : ComponentActivity(), RexPay.RexPayListener {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity(), RexPay.RexPayListener {
             .passphrase("pgptool77@@")
             .build()
 
-        RexPay.init(this, config)
+        RexPay.init(config)
 
         val rexPay = RexPay.getInstance()
         rexPay.setPaymentListener(this@MainActivity)

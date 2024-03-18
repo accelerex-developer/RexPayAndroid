@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.octacore.rexpay"
+    namespace = "com.globalaccelerex.rexpay"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

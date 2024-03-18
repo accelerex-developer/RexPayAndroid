@@ -16,7 +16,7 @@ The config object can be created in the three following ways:
 1. Supplying the Encryption keys from a FileInputStream.
 
 ```kotlin
-val config = ConfigProp.Builder(this)
+val config = ConfigProp.Builder()
     .apiUsername("Authorization Username")
     .apiPassword("Authorization Password")
     .isTest(true)
@@ -30,7 +30,7 @@ val config = ConfigProp.Builder(this)
 2. Supplying the Encryption keys as a string value.
 
 ```kotlin
-val config = ConfigProp.Builder(this)
+val config = ConfigProp.Builder()
     .apiUsername("Authorization Username")
     .apiPassword("Authorization Password")
     .isTest(true)
@@ -44,7 +44,7 @@ val config = ConfigProp.Builder(this)
 3. Supplying the Encryption keys as a File.
 
 ```kotlin
-val config = ConfigProp.Builder(this)
+val config = ConfigProp.Builder()
     .apiUsername("Authorization Username")
     .apiPassword("Authorization Password")
     .isTest(true)
@@ -55,7 +55,7 @@ val config = ConfigProp.Builder(this)
     .build()
 ```
 
-Call the `RexPay.init(this, config)` static method, passing context and the config object created,
+Call the `RexPay.init(config)` static method, passing context and the config object created,
 to initialize the SDK.
 No other configuration required&mdash;The SDK works out of the box.
 
